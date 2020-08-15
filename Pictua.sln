@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30406.217
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pictua", "Pictua\Pictua.csproj", "{B7FAAEA9-FAC3-4BDE-8DB5-934A49F8AFDA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pictua.GoogleDrive", "Pictua.GoogleDrive\Pictua.GoogleDrive.csproj", "{43EF23B7-AF25-452C-9B22-93041929DC9A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pictua.Avalonia", "Pictua.Avalonia\Pictua.Avalonia.csproj", "{82EBC5C8-2A77-48B8-B02E-E7B3B3FAD3D9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backends", "Backends", "{D7316966-CDBC-40E4-AA35-C2EF451D062E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pictua.Core", "Pictua.Core\Pictua.Core.csproj", "{86C526E7-FA17-4609-944B-D840CCAEC66D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,13 +17,24 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B7FAAEA9-FAC3-4BDE-8DB5-934A49F8AFDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B7FAAEA9-FAC3-4BDE-8DB5-934A49F8AFDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B7FAAEA9-FAC3-4BDE-8DB5-934A49F8AFDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B7FAAEA9-FAC3-4BDE-8DB5-934A49F8AFDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43EF23B7-AF25-452C-9B22-93041929DC9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43EF23B7-AF25-452C-9B22-93041929DC9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43EF23B7-AF25-452C-9B22-93041929DC9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43EF23B7-AF25-452C-9B22-93041929DC9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82EBC5C8-2A77-48B8-B02E-E7B3B3FAD3D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82EBC5C8-2A77-48B8-B02E-E7B3B3FAD3D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82EBC5C8-2A77-48B8-B02E-E7B3B3FAD3D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82EBC5C8-2A77-48B8-B02E-E7B3B3FAD3D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86C526E7-FA17-4609-944B-D840CCAEC66D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86C526E7-FA17-4609-944B-D840CCAEC66D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86C526E7-FA17-4609-944B-D840CCAEC66D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86C526E7-FA17-4609-944B-D840CCAEC66D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{43EF23B7-AF25-452C-9B22-93041929DC9A} = {D7316966-CDBC-40E4-AA35-C2EF451D062E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {85A3CBE0-873F-42BD-BB61-687FB13780B0}

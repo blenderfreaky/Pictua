@@ -1,9 +1,9 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Pictua.ViewModels;
+using Pictua.Avalonia.ViewModels;
 
-namespace Pictua
+namespace Pictua.Avalonia
 {
     public class ViewLocator : IDataTemplate
     {

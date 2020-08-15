@@ -1,10 +1,10 @@
 ﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Pictua.ViewModels;
-using Pictua.Views;
+using Pictua.Avalonia.ViewModels;
+using Pictua.Avalonia.Views;
 
-namespace Pictua
+namespace Pictua.Avalonia
 {
     public class App : Application
     {

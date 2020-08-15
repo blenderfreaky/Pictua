@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Pictua.ViewModels
+﻿namespace Pictua.Avalonia.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
