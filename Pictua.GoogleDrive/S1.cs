@@ -29,7 +29,7 @@ namespace DriveQuickstart
             {
                 // The file token.json stores the user's access and refresh tokens, and is created
                 // automatically when the authorization flow completes for the first time.
-                string credPath = "token.json";
+                const string credPath = "token.json";
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
                     Scopes,
@@ -54,20 +54,19 @@ namespace DriveQuickstart
             // List files.
             IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute()
                 .Files;
+            
             Console.WriteLine("Files:");
-            if (files != null && files.Count > 0)
-            {
-                foreach (var file in files)
-                {
-                    Console.WriteLine("{0} ({1})", file.Name, file.Id);
-                }
-            }
-            else
+
+            if (files == null || files.Count == 0)
             {
                 Console.WriteLine("No files found.");
+                return;
             }
-            Console.Read();
 
+            foreach (var file in files)
+            {
+                Console.WriteLine($"{file.Name} ({file.Id})");
+            }
         }
     }
 }
