@@ -5,13 +5,11 @@ VisualStudioVersion = 16.0.30406.217
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pictua.GoogleDrive", "Pictua.GoogleDrive\Pictua.GoogleDrive.csproj", "{43EF23B7-AF25-452C-9B22-93041929DC9A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pictua.AvaloniaUI", "Pictua.Avalonia\Pictua.AvaloniaUI.csproj", "{82EBC5C8-2A77-48B8-B02E-E7B3B3FAD3D9}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backends", "Backends", "{D7316966-CDBC-40E4-AA35-C2EF451D062E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pictua", "Pictua.Core\Pictua.csproj", "{86C526E7-FA17-4609-944B-D840CCAEC66D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pictua.OneDrive", "Pictua.OneDrive\Pictua.OneDrive.csproj", "{C4C7AF52-9BE6-4E9F-9840-F059D24E35EE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pictua", "Pictua\Pictua.csproj", "{646B5278-7F7E-4E7F-8E05-9AEE0DCE5B0C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,18 +21,14 @@ Global
 		{43EF23B7-AF25-452C-9B22-93041929DC9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43EF23B7-AF25-452C-9B22-93041929DC9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43EF23B7-AF25-452C-9B22-93041929DC9A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{82EBC5C8-2A77-48B8-B02E-E7B3B3FAD3D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{82EBC5C8-2A77-48B8-B02E-E7B3B3FAD3D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{82EBC5C8-2A77-48B8-B02E-E7B3B3FAD3D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{82EBC5C8-2A77-48B8-B02E-E7B3B3FAD3D9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{86C526E7-FA17-4609-944B-D840CCAEC66D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{86C526E7-FA17-4609-944B-D840CCAEC66D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{86C526E7-FA17-4609-944B-D840CCAEC66D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{86C526E7-FA17-4609-944B-D840CCAEC66D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C4C7AF52-9BE6-4E9F-9840-F059D24E35EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C4C7AF52-9BE6-4E9F-9840-F059D24E35EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4C7AF52-9BE6-4E9F-9840-F059D24E35EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4C7AF52-9BE6-4E9F-9840-F059D24E35EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{646B5278-7F7E-4E7F-8E05-9AEE0DCE5B0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{646B5278-7F7E-4E7F-8E05-9AEE0DCE5B0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{646B5278-7F7E-4E7F-8E05-9AEE0DCE5B0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{646B5278-7F7E-4E7F-8E05-9AEE0DCE5B0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

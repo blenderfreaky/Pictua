@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pictua.Core\Pictua.csproj" />
+    <ProjectReference Include="..\Pictua\Pictua.csproj" />
   </ItemGroup>
 
 </Project>

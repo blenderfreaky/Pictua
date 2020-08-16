@@ -60,6 +60,10 @@ namespace Pictua
             {
                 return new Client(clientFiles, new ClientIdentity(Environment.MachineName), logger);
             }
+            catch (DirectoryNotFoundException)
+            {
+                return new Client(clientFiles, new ClientIdentity(Environment.MachineName), logger);
+            }
         }
 
         public void Commit()
