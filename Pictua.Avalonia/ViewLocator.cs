@@ -1,10 +1,10 @@
-using System;
-using Avalonia.Controls;
-using Avalonia.Controls.Templates;
-using Pictua.Avalonia.ViewModels;
-
 namespace Pictua.Avalonia
 {
+    using System;
+    using global::Avalonia.Controls;
+    using global::Avalonia.Controls.Templates;
+    using Pictua.Avalonia.ViewModels;
+
     public class ViewLocator : IDataTemplate
     {
         public bool SupportsRecycling => false;

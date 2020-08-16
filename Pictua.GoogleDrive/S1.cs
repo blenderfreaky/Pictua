@@ -1,26 +1,26 @@
-﻿using Google.Apis.Auth.OAuth2;
-using Google.Apis.Drive.v3;
-using Google.Apis.Drive.v3.Data;
-using Google.Apis.Services;
-using Google.Apis.Util.Store;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace DriveQuickstart
+﻿namespace DriveQuickstart
 {
-    class Program
+    using Google.Apis.Auth.OAuth2;
+    using Google.Apis.Drive.v3;
+    using Google.Apis.Services;
+    using Google.Apis.Util.Store;
+    using Pictua.Core;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    public class GoogleDriveServer : Server
     {
         // If modifying these scopes, delete your previously saved credentials
         // at ~/.credentials/drive-dotnet-quickstart.json
-        static string[] Scopes = { DriveService.Scope.DriveReadonly };
-        static string ApplicationName = "Drive API .NET Quickstart";
+        private static readonly string[] Scopes = { DriveService.Scope.DriveAppdata };
+        private const string ApplicationName = "Pictua";
 
-        static void Main(string[] args)
+        private DriveService _service;
+
+        public GoogleDriveServer()
         {
             UserCredential credential;
 
@@ -40,21 +40,18 @@ namespace DriveQuickstart
             }
 
             // Create Drive API service.
-            var service = new DriveService(new BaseClientService.Initializer()
+            _service = new DriveService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
                 ApplicationName = ApplicationName,
             });
 
             // Define parameters of request.
-            FilesResource.ListRequest listRequest = service.Files.List();
-            listRequest.PageSize = 10;
-            listRequest.Fields = "nextPageToken, files(id, name)";
+            FilesResource.ListRequest listRequest = _service.Files.List();
 
             // List files.
-            IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute()
-                .Files;
-            
+            IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute().Files;
+
             Console.WriteLine("Files:");
 
             if (files == null || files.Count == 0)
@@ -68,5 +65,19 @@ namespace DriveQuickstart
                 Console.WriteLine($"{file.Name} ({file.Id})");
             }
         }
+
+        public override Task CommitAsync()
+        {
+        }
+
+        public override Task DeleteLocalFileAsync(ServerFile file) => throw new NotImplementedException();
+        public override Task LockAsync()
+        {
+            _service.Files.Watch(new Google.Apis.Drive.v3.Data.Channel(), )
+        }
+
+        public override Task<ConcreteFile> PullFileAsync(ServerFile file, IClientIdentity puller) => throw new NotImplementedException();
+        public override Task UnlockAsync() => throw new NotImplementedException();
+        protected override Task PushFileAsync(string origin, ServerFile target) => throw new NotImplementedException();
     }
 }

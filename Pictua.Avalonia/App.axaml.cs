@@ -1,11 +1,8 @@
-﻿using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Markup.Xaml;
-using Pictua.Avalonia.ViewModels;
-using Pictua.Avalonia.Views;
-
-namespace Pictua.Avalonia
+﻿namespace Pictua.Avalonia
 {
+    using Pictua.Avalonia.ViewModels;
+    using Pictua.Avalonia.Views;
+
     public class App : Application
     {
         public override void Initialize()

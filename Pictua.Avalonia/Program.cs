@@ -1,8 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Logging.Serilog;
-using Avalonia.ReactiveUI;
-
-namespace Pictua.Avalonia
+﻿namespace Pictua.Avalonia
 {
     internal static class Program
     {

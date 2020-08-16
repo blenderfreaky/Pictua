@@ -1,10 +1,10 @@
-﻿using System;
-using System.Diagnostics;
-using Google.Apis.Drive.v3;
-using Google.Apis.Drive.v3.Data;
-
-namespace GoogleDriveSamples
+﻿namespace GoogleDriveSamples
 {
+    using System;
+    using System.Diagnostics;
+    using Google.Apis.Drive.v3;
+    using Google.Apis.Drive.v3.Data;
+
     class DriveCommandLineSample
     {
         static void Main(string[] args)

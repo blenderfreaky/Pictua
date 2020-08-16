@@ -10,4 +10,8 @@
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.48.0.2030" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Pictua.Core\Pictua.Core.csproj" />
+  </ItemGroup>
+
 </Project>

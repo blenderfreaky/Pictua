@@ -1,8 +1,8 @@
-﻿using System.IO;
-using System.Security.Cryptography;
-
-namespace Pictua.Core
+﻿namespace Pictua.Core
 {
+    using System.IO;
+    using System.Security.Cryptography;
+
     public static class FileHashes
     {
         public static byte[] CalculateMD5(string path)
