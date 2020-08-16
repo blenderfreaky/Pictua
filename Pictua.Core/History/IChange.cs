@@ -1,13 +1,15 @@
-﻿namespace Pictua
-{
-    using System;
+﻿using Pictua.HistoryTracking;
+using System;
 
+namespace Pictua
+{
     public interface IChange
     {
-        IClientIdentity Author { get; }
+        ClientIdentity Author { get; }
 
         DateTime Time { get; }
 
-        IChange WithTime(DateTime dateTime);
+        bool Apply(State state);
+        bool Undo(State state);
     }
 }

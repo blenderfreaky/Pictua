@@ -1,78 +1,102 @@
-﻿namespace Pictua.Core
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Logging;
+using Pictua.HistoryTracking;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
 
+namespace Pictua
+{
     public abstract class Server
     {
-        public ICollection<IClientIdentity> Clients { get; }
+        [XmlIgnore]
+        public FilePathConfig FilePaths { get; }
 
-        public IDictionary<FileDescriptor, ServerFile> Files { get; }
+        public ISet<ClientIdentity> Clients { get; }
 
-        public ICollection<MetaDataUpdate> NewMetadata { get; set; }
+        public IDictionary<FileDescriptor, ServerFileInfo> Files { get; }
 
-        public void ConfirmOwnership(FileDescriptor fileDescriptor, IClientIdentity clientIdentity)
+        public History History { get; protected internal set; }
+
+        [XmlIgnore]
+        protected ILogger<Server> Logger { get; set; }
+
+        public ServerFileInfo this[FileDescriptor fileDescriptor]
         {
-            if (Files.TryGetValue(fileDescriptor, out var file))
+            get
             {
-                file.Owners.Add(clientIdentity);
-            }
-            else
-            {
-                Files[fileDescriptor] = new ServerFile(fileDescriptor, owners: new List<IClientIdentity> { clientIdentity });
-            }
-        }
-
-        public Task ConfirmRemovalAsync(ServerFile serverFile, IClientIdentity clientIdentity)
-        {
-            serverFile.Owners.Remove(clientIdentity);
-
-            if (serverFile.Owners.Count == 0)
-            {
-                if (serverFile.LocalPath == null) return;
-                return DeleteLocalFileAsync(serverFile);
-            }
-
-            return Task.CompletedTask;
-        }
-
-        public void RequestRemoval(FileDescriptor fileDescriptor)
-        {
-            if (Files.TryGetValue(fileDescriptor, out var file))
-            {
-                file.RemovalRequested = true;
-            }
-            else
-            {
-                Files[fileDescriptor] = new ServerFile(fileDescriptor, removalRequested: true);
+                if (Files.TryGetValue(fileDescriptor, out var val)) return val;
+                return Files[fileDescriptor] = new ServerFileInfo();
             }
         }
 
-        public Task PushFileAsync(ConcreteFile concreteFile, IClientIdentity pusher)
+        protected Server(FilePathConfig filePaths, ILogger<Server> logger)
         {
-            var serverFile = new ServerFile(concreteFile.FileDescriptor, concreteFile.Metadata, null, false, new List<IClientIdentity> { pusher });
-            Files[concreteFile.FileDescriptor] = serverFile;
-
-            return PushFileAsync(concreteFile.LocalPath, serverFile);
+            FilePaths = filePaths;
+            Clients = new HashSet<ClientIdentity>();
+            Files = new Dictionary<FileDescriptor, ServerFileInfo>();
+            History = new History();
+            Logger = logger;
         }
 
-        protected abstract Task PushFileAsync(string origin, ServerFile target);
-
-        public abstract Task<ConcreteFile> PullFileAsync(ServerFile file, IClientIdentity puller);
-
-        public abstract Task LockAsync();
-        public abstract Task UnlockAsync();
-
-        public abstract Task DeleteLocalFileAsync(ServerFile file);
-
-        public abstract Task CommitAsync();
-
-        public Task CleanupAsync()
+        public async void ConfirmDownloadAsync(FileDescriptor fileDescriptor, ClientIdentity clientIdentity)
         {
-            NewMetadata = NewMetadata.Where(x => !x.Owners.SequenceEqual(Clients)).ToList();
-            return Task.WhenAll(Files.Values.Where(x => x.Owners.SequenceEqual(Clients)).Select(DeleteLocalFileAsync));
+            var serverFileInfo = Files[fileDescriptor];
+            var owners = serverFileInfo.Owners;
+            owners.Add(clientIdentity);
+
+            if (owners.SetEquals(Clients))
+            {
+                if (await DeleteFileAsync(fileDescriptor).ConfigureAwait(false))
+                {
+                    serverFileInfo.IsContentOnline = false;
+                }
+                else
+                {
+                    Logger.LogError($"File Deletion failed: {fileDescriptor}, deleted because {clientIdentity} downloaded the file, serving it to all clients.");
+                }
+            }
+        }
+
+        protected abstract Task<bool> FileExistsAsnyc(string path);
+        protected abstract Task<bool> UploadAsync(Stream stream, string targetPath);
+        protected abstract Task<bool> DownloadAsync(Stream stream, string originPath);
+        protected abstract Task<bool> DeleteAsync(string path);
+
+        public virtual Task<bool> UploadAsync(FileDescriptor fileDescriptor, string originPath)
+        {
+            using var fileStream = File.OpenRead(originPath);
+            return UploadAsync(fileStream, FilePaths.GetFilePath(fileDescriptor));
+        }
+
+        public virtual Task<bool> DownloadAsync(FileDescriptor fileDescriptor, string targetPath)
+        {
+            using var fileStream = File.OpenWrite(targetPath);
+            return DownloadAsync(fileStream, FilePaths.GetFilePath(fileDescriptor));
+        }
+
+        public virtual Task<bool> DeleteFileAsync(FileDescriptor file)
+        {
+            return DeleteAsync(FilePaths.GetFilePath(file));
+        }
+
+        public virtual async Task<bool> LockAsync()
+        {
+            // TODO: Fix race condition
+            if (await FileExistsAsnyc(FilePaths.LockFilePath).ConfigureAwait(false)) return false;
+            return await UploadAsync(new MemoryStream(), FilePaths.LockFilePath).ConfigureAwait(false);
+        }
+
+        public virtual Task<bool> UnlockAsync()
+        {
+            return DeleteAsync(FilePaths.LockFilePath);
+        }
+
+        public virtual Task<bool> CommitAsync()
+        {
+            using var memStream = new MemoryStream();
+            Xml.Serialize(GetType(), memStream, this);
+            return UploadAsync(memStream, FilePaths.StateFilePath);
         }
     }
 }

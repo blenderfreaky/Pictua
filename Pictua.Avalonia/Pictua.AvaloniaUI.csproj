@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>Pictua.Avalonia</AssemblyName>
+    <RootNamespace>Pictua.Avalonia</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.9.12" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.9.12" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.9.12" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging.TraceSource" Version="3.1.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Pictua.Core\Pictua.csproj" />
+    <ProjectReference Include="..\Pictua.GoogleDrive\Pictua.GoogleDrive.csproj" />
+    <ProjectReference Include="..\Pictua.OneDrive\Pictua.OneDrive.csproj" />
+  </ItemGroup>
+</Project>

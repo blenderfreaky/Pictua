@@ -2,7 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Pictua.Avalonia.Views
+namespace Pictua.AvaloniaUI.Views
 {
     public class MainWindow : Window
     {

@@ -1,26 +1,36 @@
-﻿namespace Pictua.HistoryTracking
-{
-    using Pictua;
-    using System;
-    using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
+namespace Pictua.HistoryTracking
+{
     public struct ChangeFileAdd : IChange
     {
-        public IClientIdentity Author { get; }
+        public ClientIdentity Author { get; }
 
         public DateTime Time { get; }
 
         public FileDescriptor File { get; }
+        public FileMetadata? NewMetadata { get; }
 
-        public ChangeFileAdd(IClientIdentity author, DateTime time, FileDescriptor file)
+        public ChangeFileAdd(ClientIdentity author, DateTime time, FileDescriptor file, FileMetadata? newMetadata)
         {
             Author = author;
             Time = time;
             File = file;
+            NewMetadata = newMetadata;
         }
 
-        public IChange WithTime(DateTime dateTime) => new ChangeFileRemove(Author, dateTime, File);
-        public override bool Equals(object? obj) => obj is ChangeFileAdd add && EqualityComparer<IClientIdentity>.Default.Equals(Author, add.Author) && Time == add.Time && EqualityComparer<FileDescriptor>.Default.Equals(File, add.File);
-        public override int GetHashCode() => HashCode.Combine(Author, Time, File);
+        public override bool Equals(object? obj) => obj is ChangeFileAdd add && EqualityComparer<ClientIdentity>.Default.Equals(Author, add.Author) && Time == add.Time && EqualityComparer<FileDescriptor>.Default.Equals(File, add.File) && EqualityComparer<FileMetadata?>.Default.Equals(NewMetadata, add.NewMetadata);
+        public override int GetHashCode() => HashCode.Combine(Author, Time, File, NewMetadata);
+
+        public bool Apply(State state)
+        {
+            return state._files.TryAdd(File, NewMetadata);
+        }
+
+        public bool Undo(State state)
+        {
+            return state._files.Remove(File);
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using ReactiveUI;
 
-namespace Pictua.Avalonia.ViewModels
+namespace Pictua.AvaloniaUI.ViewModels
 {
     public class ViewModelBase : ReactiveObject
     {

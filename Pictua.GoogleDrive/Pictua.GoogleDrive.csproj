@@ -8,10 +8,17 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.48.0.2030" />
+    <PackageReference Include="MimeTypesMap" Version="1.0.8" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pictua.Core\Pictua.Core.csproj" />
+    <ProjectReference Include="..\Pictua.Core\Pictua.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="credentials.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

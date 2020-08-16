@@ -1,89 +1,204 @@
-﻿namespace Pictua.Core
+﻿using Microsoft.Extensions.Logging;
+using Pictua.HistoryTracking;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
+
+namespace Pictua
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Threading.Tasks;
-
-    public class Client
+    public class Client : IDisposable
     {
-        public IClientIdentity Identity { get; }
+        [XmlIgnore]
+        public FilePathConfig FilePaths { get; private set; }
 
-        public IDictionary<FileDescriptor, ConcreteFile> StoredFiles { get; }
+        public ClientIdentity Identity { get; }
+
+        public History History { get; protected internal set; }
+
+        public IDictionary<FileDescriptor, FileMetadata?> Files { get; }
+
+        public ISet<FileDescriptor> FilesAwaitingDownload { get; }
+        public ISet<FileDescriptor> FilesAwaitingUpload { get; }
+
+        public IDictionary<FileDescriptor, DateTime> DeletedOn { get; }
+
+        [XmlIgnore]
+        protected ILogger<Client> Logger { get; set; }
+
+        [XmlIgnore]
+        private FileStream? LockFileStream { get; set; }
+
+        [XmlIgnore]
+        private bool disposedValue;
+
+        protected Client(FilePathConfig filePaths, ClientIdentity identity, ILogger<Client> logger)
+        {
+            FilePaths = filePaths;
+            Identity = identity;
+            History = new History();
+            Files = new Dictionary<FileDescriptor, FileMetadata?>();
+            FilesAwaitingDownload = new HashSet<FileDescriptor>();
+            FilesAwaitingUpload = new HashSet<FileDescriptor>();
+            DeletedOn = new Dictionary<FileDescriptor, DateTime>();
+            Logger = logger;
+        }
+
+        public static Client Create(FilePathConfig clientFiles, ILogger<Client> logger)
+        {
+            try
+            {
+                using var fileStream = File.OpenRead(clientFiles.StateFilePath);
+                var client = Xml.Deserialize<Client>(fileStream);
+                client.FilePaths = clientFiles;
+                client.Logger = logger;
+                return client;
+            }
+            catch (FileNotFoundException)
+            {
+                return new Client(clientFiles, new ClientIdentity(Environment.MachineName), logger);
+            }
+        }
+
+        public void Commit()
+        {
+            using var fileStream = File.OpenWrite(FilePaths.StateFilePath);
+            Xml.Serialize(GetType(), fileStream, this);
+        }
+
+        public bool Lock()
+        {
+            try
+            {
+                LockFileStream = new FileStream(FilePaths.LockFilePath, FileMode.CreateNew, FileAccess.Read, FileShare.None);
+                return true;
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+        }
+
+        public void Unlock()
+        {
+            LockFileStream?.Dispose();
+            File.Delete(FilePaths.LockFilePath);
+        }
 
         public async Task SyncAsync(Server server)
         {
             await server.LockAsync().ConfigureAwait(false);
 
-            var push = StoredFiles
-                .Where(x => !server.Files.TryGetValue(x.FileDescriptor, out var file) || file.LocalPath == null)
-                .Select(x => server.PushFileAsync(x, Identity));
+            var merged = server.History.MergeFrom(History);
 
-            var pull = server.Files.Values
-                .Where(x => !x.RemovalRequested && StoredFiles.All(y => y.FileDescriptor != x.FileDescriptor))
-                .Select(serverFile => PullFileAsync(serverFile, server));
+            var localChanges = History.HeadState.ChangeTo(merged.HeadState, Identity, DateTime.UtcNow).Select(x => ApplyChangeLocally(x, server));
+            var serverChanges = server.History.HeadState.ChangeTo(merged.HeadState, Identity, DateTime.UtcNow).Select(x => ApplyChangeOnServer(x, server));
 
-            var delete = server.Files.Values
-                .Where(x => x.RemovalRequested)
-                .Select(x => RemoveFileAsync(x, server));
+            await Task.WhenAll(localChanges.Concat(serverChanges)).ConfigureAwait(false);
 
-            await Task.WhenAll(push.Concat(pull).Concat(delete)).ConfigureAwait(false);
-
-            foreach (var serverMetadata in server.NewMetadata)
-            {
-                if (StoredFiles.TryGetValue(serverMetadata.FileDescriptor, out var local)
-                    && local.Metadata.LastUpdated < serverMetadata.Metadata.LastUpdated)
-                {
-                    local.Metadata = serverMetadata.Metadata;
-                    serverMetadata.Owners.Add(Identity);
-                }
-            }
-
-            foreach (var localFile in StoredFiles.Values)
-            {
-                if (!server.Files.TryGetValue(localFile.FileDescriptor, out var file)) continue;
-                if (file.Metadata == null) continue;
-
-                if (localFile.Metadata.LastUpdated <= file.Metadata.Value.LastUpdated)
-                {
-                    // TODO
-                    //localFile.Metadata = file.Metadata.Value;
-                    continue;
-                }
-
-                server.NewMetadata.Add(
-                    new MetaDataUpdate(localFile.FileDescriptor, localFile.Metadata, new List<IClientIdentity> { Identity }));
-            }
-
-            await server.CleanupAsync().ConfigureAwait(false);
+            History = merged;
+            server.History = merged.Clone();
 
             await server.CommitAsync().ConfigureAwait(false);
 
             await server.UnlockAsync().ConfigureAwait(false);
         }
 
-        protected async Task PullFileAsync(ServerFile serverFile, Server server)
+        public async Task ApplyChangeLocally(IChange change, Server server)
         {
-            var file = await server.PullFileAsync(serverFile, Identity).ConfigureAwait(false);
-
-            if (serverFile.FileDescriptor != file.FileDescriptor) throw new InvalidOperationException("Invalid download");
-
-            StoredFiles[file.FileDescriptor] = file;
-
-            server.ConfirmOwnership(file.FileDescriptor, Identity);
-        }
-
-        protected Task RemoveFileAsync(ServerFile serverFile, Server server)
-        {
-            if (!StoredFiles.TryGetValue(serverFile.FileDescriptor, out var local))
+            switch (change)
             {
-                return server.ConfirmRemovalAsync(serverFile, Identity);
+                case ChangeFileAdd fileAdd:
+                    if (await server.DownloadAsync(fileAdd.File, FilePaths.GetFilePath(fileAdd.File)).ConfigureAwait(false))
+                    {
+                        server.Files[fileAdd.File].Owners.Add(Identity);
+                    }
+                    else
+                    {
+                        FilesAwaitingDownload.Add(fileAdd.File);
+                        Logger.LogError($"Error downloading file: {fileAdd.File}");
+                    }
+                    break;
+
+                case ChangeFileRemove fileRemove:
+                    try
+                    {
+                        File.Move(FilePaths.GetFilePath(fileRemove.File), FilePaths.GetTrashFilePath(fileRemove.File));
+                        DeletedOn[fileRemove.File] = DateTime.UtcNow;
+                    }
+                    catch (IOException ex)
+                    {
+                        Logger.LogError(ex, $"Error deleting file: {fileRemove.File}");
+                    }
+                    break;
+
+                case ChangeMetadata metadata:
+                    Files[metadata.Target] = metadata.NewMetadata;
+                    break;
+
+                default:
+                    throw new ArgumentException("Unknown change type", nameof(change));
             }
-
-            File.Delete(local.LocalPath);
-
-            return server.ConfirmRemovalAsync(serverFile, Identity);
         }
+
+        public async Task ApplyChangeOnServer(IChange change, Server server)
+        {
+            switch (change)
+            {
+                case ChangeFileAdd fileAdd:
+                    if (!await server.UploadAsync(fileAdd.File, FilePaths.GetFilePath(fileAdd.File)).ConfigureAwait(false))
+                    {
+                        FilesAwaitingUpload.Add(fileAdd.File);
+                        Logger.LogError($"Error uploading file: {fileAdd.File}");
+                    }
+                    break;
+
+                case ChangeFileRemove fileRemove:
+                    if (!await server.DeleteFileAsync(fileRemove.File).ConfigureAwait(false))
+                    {
+                        Logger.LogError($"Error deleting server file: {fileRemove.File}");
+                    }
+                    break;
+
+                case ChangeMetadata metadata:
+                    server[metadata.Target].Metadata = metadata.NewMetadata;
+                    break;
+
+                default:
+                    throw new ArgumentException("Unknown change type", nameof(change));
+            }
+        }
+
+        #region IDisposable
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                }
+
+                Unlock();
+                disposedValue = true;
+            }
+        }
+        ~Client()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: false);
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
     }
 }

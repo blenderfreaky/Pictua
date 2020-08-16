@@ -1,8 +1,8 @@
-﻿namespace Pictua.Core
-{
-    using System;
-    using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
+namespace Pictua
+{
     public struct FileMetadata
     {
         public DateTime LastUpdated { get; }

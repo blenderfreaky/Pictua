@@ -1,4 +1,4 @@
-﻿namespace Pictua.Core
+﻿namespace Pictua
 {
     public interface ITag
     {

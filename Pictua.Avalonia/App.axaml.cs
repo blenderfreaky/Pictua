@@ -1,8 +1,11 @@
-﻿namespace Pictua.Avalonia
-{
-    using Pictua.Avalonia.ViewModels;
-    using Pictua.Avalonia.Views;
+﻿using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
+using Pictua.AvaloniaUI.ViewModels;
+using Pictua.AvaloniaUI.Views;
 
+namespace Pictua.AvaloniaUI
+{
     public class App : Application
     {
         public override void Initialize()

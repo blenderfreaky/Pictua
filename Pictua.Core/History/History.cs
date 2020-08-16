@@ -1,30 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Pictua.HistoryTracking
 {
-    public class State
-    {
-        public ICollection<FileDescriptor> Files { get; }
-        public IDictionary<FileDescriptor, FileMetadata> Metadata { get; }
-
-        public State(ICollection<FileDescriptor> files, IDictionary<FileDescriptor, FileMetadata> metadata)
-        {
-            Files = files;
-            Metadata = metadata;
-        }
-
-        public State() : this(new List<FileDescriptor>(), new Dictionary<FileDescriptor, FileMetadata>()) { }
-
-        public State(History history) : this()
-        {
-            //foreach (var )
-        }
-    }
-
     public class History : IEnumerable<IChange>
     {
         private readonly List<IChange> _diffs;
@@ -37,6 +16,8 @@ namespace Pictua.HistoryTracking
 
         public History() : this(new List<IChange>()) { }
 
+        public History Clone() => new History(new List<IChange>(_diffs));
+
         public IChange this[int index] { get => _diffs[index]; }
 
         public int Count => _diffs.Count;
@@ -45,9 +26,11 @@ namespace Pictua.HistoryTracking
 
         public State HeadState { get; }
 
-        public void Add(IChange item)
+        public bool Add(IChange change)
         {
-            _diffs.Add(item);
+            _diffs.Add(change);
+
+            return HeadState.Apply(change);
         }
 
         public IEnumerator<IChange> GetEnumerator() => _diffs.GetEnumerator();
@@ -82,19 +65,22 @@ namespace Pictua.HistoryTracking
             }
         }
 
-        public IEnumerable<IChange> MergeFrom(History other)
+        public History MergeFrom(History other)
         {
-            var commonOrigin = Math.Min(Count, other.Count);
+            var self = Clone();
+
+            var commonOrigin = Math.Min(self.Count, other.Count);
             for (; commonOrigin >= 0; commonOrigin--)
             {
-                if (this[commonOrigin] == other[commonOrigin]) break;
+                if (self[commonOrigin] == other[commonOrigin]) break;
             }
 
             foreach (var otherChange in other.GetAllAfter(commonOrigin + 1))
             {
-                Add(otherChange);
-                yield return otherChange;
+                self.Add(otherChange);
             }
+
+            return self;
         }
     }
 }

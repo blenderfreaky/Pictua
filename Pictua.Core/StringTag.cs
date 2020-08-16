@@ -1,7 +1,7 @@
-﻿namespace Pictua.Core
-{
-    using System;
+﻿using System;
 
+namespace Pictua
+{
     public struct StringTag : ITag
     {
         public string Text { get; }
