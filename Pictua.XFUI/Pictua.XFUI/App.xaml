@@ -32,5 +32,26 @@
             <On Platform="UWP" 
           Value="/Assets/FontAwesome5Free-Regular-400.otf#Font Awesome 5 Free" />
         </OnPlatform>
+
+        <ResourceDictionary>
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="{DynamicResource RegularTextColor}" />
+                <Setter Property="FontSize" Value="Default" />
+                <Setter Property="Padding" Value="30,6,30,6" />
+                <Setter Property="FontFamily" Value="Segoe UI" />
+            </Style>
+
+            <Style x:Key="Title" TargetType="Label">
+                <Setter Property="TextColor" Value="{DynamicResource TitleTextColor}" />
+                <Setter Property="FontSize" Value="Title" />
+                <Setter Property="Padding" Value="32,10,32,10" />
+            </Style>
+
+            <Style TargetType="ContentPage">
+                <Setter Property="BackgroundColor" Value="{DynamicResource PageBackgroundColor}" />
+            </Style>
+        </ResourceDictionary>
+        
+        <ResourceDictionary Source="Themes/DarkTheme.xaml" />
     </Application.Resources>
 </Application>

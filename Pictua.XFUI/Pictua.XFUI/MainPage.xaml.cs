@@ -2,7 +2,7 @@
 
 namespace Pictua.XFUI
 {
-    public partial class MainPage : Shell
+    public partial class MainPage : ContentPage
     {
         public MainPage()
         {
