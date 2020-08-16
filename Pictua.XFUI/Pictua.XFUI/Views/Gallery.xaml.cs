@@ -11,5 +11,10 @@ namespace Pictua.XFUI.Views
         {
             InitializeComponent();
         }
+
+        private void Button_Clicked(object sender, System.EventArgs e)
+        {
+
+        }
     }
 }

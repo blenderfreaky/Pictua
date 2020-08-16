@@ -8,5 +8,10 @@ namespace Pictua.XFUI
         {
             InitializeComponent();
         }
+
+        private void BackButtonClicked(object sender, System.EventArgs e)
+        {
+
+        }
     }
 }

@@ -5,21 +5,7 @@
              x:Class="Pictua.XFUI.Views.Gallery">
 
     <StackLayout>
-        <Frame BackgroundColor="{DynamicResource NavigationBarColor}" Padding="10" CornerRadius="0">
-            <Label Text="{x:Static fontawesome:FontAwesomeIcons.Images}" FontFamily="{StaticResource FontAwesomeRegular}"/>
-        </Frame>
         <Label Text="Start developing now" Style="{StaticResource Title}"/>
-        <Label Text="Make changes to your XAML file and save to see your UI update in the running app with XAML Hot Reload. Give it a try!"/>
-        <Label FontSize="16">
-            <Label.FormattedText>
-                <FormattedString>
-                    <FormattedString.Spans>
-                        <Span Text="Learn more at "/>
-                        <Span Text="https://aka.ms/xamarin-quickstart" FontAttributes="Bold"/>
-                    </FormattedString.Spans>
-                </FormattedString>
-            </Label.FormattedText>
-        </Label>
     </StackLayout>
 
 </ContentView>

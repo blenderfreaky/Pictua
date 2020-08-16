@@ -6,7 +6,7 @@
     <Color x:Key="NavigationBarColor">Teal</Color>
     <Color x:Key="PrimaryColor">Teal</Color>
     <Color x:Key="SecondaryColor">White</Color>
-    <Color x:Key="TitleTextColor">#676767</Color>
+    <Color x:Key="TitleTextColor">#A0A0A0</Color>
     <Color x:Key="RegularTextColor">#ffffff</Color>
     <Color x:Key="TransparentColor">Transparent</Color>
 </ResourceDictionary>

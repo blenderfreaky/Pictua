@@ -37,18 +37,24 @@
             <Style TargetType="Label">
                 <Setter Property="TextColor" Value="{DynamicResource RegularTextColor}" />
                 <Setter Property="FontSize" Value="Default" />
-                <Setter Property="Padding" Value="30,6,30,6" />
+                <Setter Property="Padding" Value="20,6,20,6" />
                 <Setter Property="FontFamily" Value="Segoe UI" />
             </Style>
 
             <Style x:Key="Title" TargetType="Label">
                 <Setter Property="TextColor" Value="{DynamicResource TitleTextColor}" />
                 <Setter Property="FontSize" Value="Title" />
-                <Setter Property="Padding" Value="32,10,32,10" />
+                <Setter Property="Padding" Value="22,10,22,10" />
             </Style>
 
             <Style TargetType="ContentPage">
                 <Setter Property="BackgroundColor" Value="{DynamicResource PageBackgroundColor}" />
+            </Style>
+
+            <Style TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{DynamicResource TransparentColor}" />
+                <Setter Property="FontSize" Value="Large" />
+                <!--<Setter Property="FontFamily" Value="{StaticResource FontAwesomeRegular}" />-->
             </Style>
         </ResourceDictionary>
         
