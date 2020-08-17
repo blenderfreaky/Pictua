@@ -11,7 +11,6 @@ namespace Pictua.XFUI
 
         private void BackButtonClicked(object sender, System.EventArgs e)
         {
-
         }
     }
 }

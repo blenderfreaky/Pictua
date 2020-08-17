@@ -6,8 +6,8 @@
              x:Class="Pictua.XFUI.MainPage">
 
     <StackLayout>
-        <Frame BackgroundColor="{DynamicResource NavigationBarColor}" Padding="10" CornerRadius="0">
-            <Button Text="{x:Static fontawesome:FontAwesomeIcons.ArrowLeft}" FontFamily="{StaticResource FontAwesomeRegular}" HorizontalOptions="Start" TextColor="{DynamicResource SecondaryColor}" Padding="-30,0,0,0" Clicked="BackButtonClicked"/>
+        <Frame BackgroundColor="{DynamicResource NavigationBarColor}" CornerRadius="0">
+            <Button Text="{x:Static fontawesome:FontAwesomeIcons.ArrowLeft}" FontFamily="{StaticResource FontAwesomeRegular}" HorizontalOptions="Start" TextColor="{DynamicResource SecondaryColor}" Padding="0" Clicked="BackButtonClicked" />
         </Frame>
         <views:Gallery/>
     </StackLayout>
