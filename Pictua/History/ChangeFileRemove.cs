@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Pictua.HistoryTracking
 {
-    public struct ChangeFileRemove : IChange
+    public struct ChangeFileRemove : IChange, IEquatable<ChangeFileRemove>
     {
         public ClientIdentity Author { get; }
 
@@ -20,7 +20,9 @@ namespace Pictua.HistoryTracking
             OldMetadata = oldMetadata;
         }
 
-        public override bool Equals(object? obj) => obj is ChangeFileRemove remove && EqualityComparer<ClientIdentity>.Default.Equals(Author, remove.Author) && Time == remove.Time && EqualityComparer<FileDescriptor>.Default.Equals(File, remove.File) && EqualityComparer<FileMetadata?>.Default.Equals(OldMetadata, remove.OldMetadata);
+        public override bool Equals(object? obj) => obj is ChangeFileRemove remove && Equals(remove);
+        public bool Equals(ChangeFileRemove other) => EqualityComparer<ClientIdentity>.Default.Equals(Author, other.Author) && Time == other.Time && EqualityComparer<FileDescriptor>.Default.Equals(File, other.File) && EqualityComparer<FileMetadata?>.Default.Equals(OldMetadata, other.OldMetadata);
+        
         public override int GetHashCode() => HashCode.Combine(Author, Time, File, OldMetadata);
 
         public bool Apply(State state)
@@ -32,5 +34,9 @@ namespace Pictua.HistoryTracking
         {
             return state._files.TryAdd(File, OldMetadata);
         }
+
+        public static bool operator ==(ChangeFileRemove left, ChangeFileRemove right) => left.Equals(right);
+
+        public static bool operator !=(ChangeFileRemove left, ChangeFileRemove right) => !(left == right);
     }
 }

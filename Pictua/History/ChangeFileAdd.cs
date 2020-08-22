@@ -20,7 +20,9 @@ namespace Pictua.HistoryTracking
             NewMetadata = newMetadata;
         }
 
-        public override bool Equals(object? obj) => obj is ChangeFileAdd add && EqualityComparer<ClientIdentity>.Default.Equals(Author, add.Author) && Time == add.Time && EqualityComparer<FileDescriptor>.Default.Equals(File, add.File) && EqualityComparer<FileMetadata?>.Default.Equals(NewMetadata, add.NewMetadata);
+        public override bool Equals(object? obj) => obj is ChangeFileAdd add && Equals(obj);
+        private readonly bool Equals(ChangeFileAdd add) => EqualityComparer<ClientIdentity>.Default.Equals(Author, add.Author) && Time == add.Time && EqualityComparer<FileDescriptor>.Default.Equals(File, add.File) && EqualityComparer<FileMetadata?>.Default.Equals(NewMetadata, add.NewMetadata);
+
         public override int GetHashCode() => HashCode.Combine(Author, Time, File, NewMetadata);
 
         public bool Apply(State state)
@@ -32,5 +34,9 @@ namespace Pictua.HistoryTracking
         {
             return state._files.Remove(File);
         }
+
+        public static bool operator ==(ChangeFileAdd left, ChangeFileAdd right) => left.Equals(right);
+
+        public static bool operator !=(ChangeFileAdd left, ChangeFileAdd right) => !(left == right);
     }
 }

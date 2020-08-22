@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Pictua
 {
-    public struct FileDescriptor
+    public struct FileDescriptor : IEquatable<FileDescriptor>
     {
         public string Extension { get; }
 
@@ -27,7 +28,13 @@ namespace Pictua
             ContentHash = FileHashes.CalculateMD5(filePath);
         }
 
-        public override bool Equals(object? obj) => obj is FileDescriptor descriptor && Extension == descriptor.Extension && EqualityComparer<byte[]>.Default.Equals(ContentHash, descriptor.ContentHash) && ContentHashString == descriptor.ContentHashString && UniqueName == descriptor.UniqueName;
+        public override bool Equals(object? obj) => obj is FileDescriptor descriptor && Equals(descriptor);
+        public bool Equals(FileDescriptor other) => Extension == other.Extension && ContentHash.SequenceEqual(other.ContentHash);
+
         public override int GetHashCode() => HashCode.Combine(Extension, ContentHash, ContentHashString, UniqueName);
+
+        public static bool operator ==(FileDescriptor left, FileDescriptor right) => left.Equals(right);
+
+        public static bool operator !=(FileDescriptor left, FileDescriptor right) => !(left == right);
     }
 }
