@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Pictua.GoogleDrive\Pictua.GoogleDrive.csproj" />
     <ProjectReference Include="..\Pictua.OneDrive\Pictua.OneDrive.csproj" />
     <ProjectReference Include="..\Pictua\Pictua.csproj" />
   </ItemGroup>

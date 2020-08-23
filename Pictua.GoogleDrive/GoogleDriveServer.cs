@@ -4,7 +4,6 @@ using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using HeyRed.Mime;
 using Microsoft.Extensions.Logging;
-using Pictua;
 using System;
 using System.IO;
 using System.Linq;
@@ -12,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GDFile = Google.Apis.Drive.v3.Data.File;
 
-namespace DriveQuickstart
+namespace Pictua.GoogleDrive
 {
     public class GoogleDriveServer : Server
     {
@@ -47,6 +46,8 @@ namespace DriveQuickstart
                 ApplicationName = "Pictua",
             });
         }
+
+        public static GoogleDriveServer Create(FilePathConfig filePaths, ILogger<GoogleDriveServer> logger) => new GoogleDriveServer(filePaths, logger);
 
         protected async Task<string?> GetFileId(string path)
         {
