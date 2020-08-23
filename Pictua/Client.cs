@@ -48,6 +48,11 @@ namespace Pictua
 
         public static Client Create(FilePathConfig clientFiles, ILogger<Client> logger)
         {
+            if (!File.Exists(clientFiles.StateFilePath))
+            {
+                return new Client(clientFiles, new ClientIdentity(Environment.MachineName), logger);
+            }
+
             try
             {
                 using var fileStream = File.OpenRead(clientFiles.StateFilePath);
@@ -76,8 +81,18 @@ namespace Pictua
         {
             try
             {
-                LockFileStream = new FileStream(FilePaths.LockFilePath, FileMode.CreateNew, FileAccess.Read, FileShare.None);
+                if (File.Exists(FilePaths.LockFilePath)) return false;
+
+                var directory = Path.GetDirectoryName(FilePaths.LockFilePath);
+
+                if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
+                LockFileStream = new FileStream(FilePaths.LockFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
                 return true;
+            }
+            catch (DirectoryNotFoundException)
+            {
+                return false;
             }
             catch (IOException)
             {
@@ -93,7 +108,7 @@ namespace Pictua
 
         public async Task SyncAsync(Server server)
         {
-            await server.LockAsync().ConfigureAwait(false);
+            if (!Lock() || !await server.LockAsync().ConfigureAwait(false)) throw new Exception("Locking failed.");
 
             var merged = server.History.MergeFrom(History);
 
@@ -105,8 +120,10 @@ namespace Pictua
             History = merged;
             server.History = merged.Clone();
 
+            Commit();
             await server.CommitAsync().ConfigureAwait(false);
 
+            Unlock();
             await server.UnlockAsync().ConfigureAwait(false);
         }
 

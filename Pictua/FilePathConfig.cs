@@ -20,7 +20,7 @@ namespace Pictua
         public static FilePathConfig Client => new FilePathConfig(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppName));
         public static FilePathConfig Server => new FilePathConfig("");
 
-        private FilePathConfig(string rootPath)
+        public FilePathConfig(string rootPath)
         {
             RootPath = rootPath;
             LockFilePath = Path.Combine(RootPath, LockFileName);
