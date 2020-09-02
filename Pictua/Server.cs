@@ -2,6 +2,7 @@
 using Pictua.HistoryTracking;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -84,7 +85,7 @@ namespace Pictua
         {
             // TODO: Fix race condition
             if (await FileExistsAsnyc(FilePaths.LockFilePath).ConfigureAwait(false)) return false;
-            return await UploadAsync(new MemoryStream(), FilePaths.LockFilePath).ConfigureAwait(false);
+            return await UploadAsync(new MemoryStream(Encoding.UTF8.GetBytes("Lock")), FilePaths.LockFilePath).ConfigureAwait(false);
         }
 
         public virtual Task<bool> UnlockAsync()

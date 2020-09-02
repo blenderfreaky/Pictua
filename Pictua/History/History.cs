@@ -69,7 +69,7 @@ namespace Pictua.HistoryTracking
         {
             var self = Clone();
 
-            var commonOrigin = Math.Min(self.Count, other.Count);
+            var commonOrigin = Math.Min(self.Count, other.Count) - 1;
             for (; commonOrigin >= 0; commonOrigin--)
             {
                 if (self[commonOrigin] == other[commonOrigin]) break;

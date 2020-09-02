@@ -21,6 +21,7 @@ namespace Pictua.XFUI.Droid
             Xamarin.Forms.Forms.Init(this, savedInstanceState);
 
             LoadApplication(new App());
+            App.ParentWindow = this;
         }
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {

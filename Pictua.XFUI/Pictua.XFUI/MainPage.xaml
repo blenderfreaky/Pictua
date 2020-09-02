@@ -7,7 +7,11 @@
 
     <StackLayout>
         <Frame BackgroundColor="{DynamicResource NavigationBarColor}" CornerRadius="0">
-            <Button Text="{x:Static fontawesome:FontAwesomeIcons.ArrowLeft}" FontFamily="{StaticResource FontAwesomeRegular}" HorizontalOptions="Start" TextColor="{DynamicResource SecondaryColor}" Padding="0" Clicked="BackButtonClicked" />
+            <Grid>
+                <Button Text="{x:Static fontawesome:FontAwesomeIcons.ArrowLeft}" FontFamily="{StaticResource FontAwesomeRegular}" HorizontalOptions="Start" TextColor="{DynamicResource SecondaryColor}" Padding="0" Clicked="OnBack" />
+                <Button x:Name="SignInButton" Text="Sign in" HorizontalOptions="End" Clicked="SignInButton_Clicked"/>
+                <Button x:Name="SyncButton" Text="Sync" IsVisible="false" HorizontalOptions="End" Clicked="SyncButton_Clicked"/>
+            </Grid>
         </Frame>
         <views:Gallery/>
     </StackLayout>

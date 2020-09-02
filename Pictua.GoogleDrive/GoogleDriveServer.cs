@@ -32,7 +32,11 @@ namespace Pictua.GoogleDrive
                 const string credPath = "token.json";
                 var googleClientSecrets = GoogleClientSecrets.Load(stream);
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    googleClientSecrets.Secrets,
+                    new ClientSecrets
+                    {
+                        ClientId = "PUT_CLIENT_ID_HERE",
+                        ClientSecret = "PUT_CLIENT_SECRETS_HERE"
+                    },
                     Scopes,
                     "user",
                     CancellationToken.None,

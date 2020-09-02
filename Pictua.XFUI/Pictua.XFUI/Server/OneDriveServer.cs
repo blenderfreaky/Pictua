@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Pictua.XFUI;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -13,14 +14,9 @@ namespace Pictua.OneDrive
             OneDrive = oneDrive;
         }
 
-        public static async Task<OneDriveServer> Create(string clientId, FilePathConfig filePaths, ILogger<OneDriveServer> logger)
+        public static async Task<OneDriveServer> Create(App app, FilePathConfig filePaths, ILogger<OneDriveServer> logger)
         {
-            return new OneDriveServer(await OneDrive.CreateAsync(clientId).ConfigureAwait(false), filePaths, logger);
-        }
-
-        public static Task<OneDriveServer> Create(FilePathConfig filePaths, ILogger<OneDriveServer> logger)
-        {
-            return Create("fd564916-e1a7-41aa-9e2e-5867cac60129", filePaths, logger);
+            return new OneDriveServer(await OneDrive.CreateAsync(app).ConfigureAwait(false), filePaths, logger);
         }
 
         protected override async Task<bool> UploadAsync(Stream stream, string targetPath)

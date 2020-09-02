@@ -34,6 +34,8 @@ namespace Pictua
         [XmlIgnore]
         private bool disposedValue;
 
+        private Client() { }
+
         protected Client(FilePathConfig filePaths, ClientIdentity identity, ILogger<Client> logger)
         {
             FilePaths = filePaths;
@@ -81,7 +83,21 @@ namespace Pictua
         {
             try
             {
-                if (File.Exists(FilePaths.LockFilePath)) return false;
+                if (File.Exists(FilePaths.LockFilePath))
+                {
+                    try
+                    {
+                        File.Delete(FilePaths.LockFilePath);
+                    }
+                    catch (IOException)
+                    {
+                        return false;
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        return false;
+                    }
+                }
 
                 var directory = Path.GetDirectoryName(FilePaths.LockFilePath);
 
@@ -98,6 +114,10 @@ namespace Pictua
             {
                 return false;
             }
+            catch (UnauthorizedAccessException)
+            {
+                return false;
+            }
         }
 
         public void Unlock()
@@ -108,7 +128,8 @@ namespace Pictua
 
         public async Task SyncAsync(Server server)
         {
-            if (!Lock() || !await server.LockAsync().ConfigureAwait(false)) throw new Exception("Locking failed.");
+            if (!Lock()) throw new Exception("Client locking failed.");
+            if (!await server.LockAsync().ConfigureAwait(false)) throw new Exception("Server locking failed.");
 
             var merged = server.History.MergeFrom(History);
 

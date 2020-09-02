@@ -1,4 +1,7 @@
-﻿namespace Pictua.XFUI.UWP
+﻿using System;
+using Windows.Security.Authentication.Web;
+
+namespace Pictua.XFUI.UWP
 {
     public sealed partial class MainPage
     {
@@ -6,7 +9,9 @@
         {
             InitializeComponent();
 
-            LoadApplication(new XFUI.App());
+            var redirectURI = WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
+
+            LoadApplication(new XFUI.App(redirectURI.AbsoluteUri));
         }
     }
 }

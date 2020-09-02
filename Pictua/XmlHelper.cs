@@ -11,12 +11,20 @@ namespace Pictua
 
         public static void Serialize(Type type, Stream stream, object? value)
         {
-            _serializers[type].Serialize(stream, value);
+            if (!_serializers.TryGetValue(type, out var serializer))
+            {
+                _serializers[type] = serializer = new XmlSerializer(type);
+            }
+            serializer.Serialize(stream, value);
         }
 
         public static object Deserialize(Type type, Stream stream)
         {
-            return _serializers[type].Deserialize(stream);
+            if (!_serializers.TryGetValue(type, out var serializer))
+            {
+                _serializers[type] = serializer = new XmlSerializer(type);
+            }
+            return serializer.Deserialize(stream);
         }
 
         public static void Serialize<T>(Stream stream, T value)

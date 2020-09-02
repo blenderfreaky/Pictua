@@ -1,10 +1,11 @@
 ﻿using Microsoft.Graph;
-using Microsoft.Graph.Auth;
 using Microsoft.Identity.Client;
+using Pictua.XFUI;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
@@ -12,51 +13,51 @@ namespace Pictua.OneDrive
 {
     public class OneDrive
     {
-        private readonly IPublicClientApplication _app;
-        private readonly GraphServiceClient _graphClient;
+        private readonly App App;
+        private GraphServiceClient _graphClient;
 
         private IDriveItemRequestBuilder AppRoot => _graphClient.Drive.Special.AppRoot;
 
-        public OneDrive(IPublicClientApplication app, GraphServiceClient graphClient)
+        public static string[] Scopes = { "Files.ReadWrite.AppFolder" };
+
+        public OneDrive(App app)
         {
-            _app = app;
-            _graphClient = graphClient;
+            App = app;
         }
 
-        private static readonly string[] Scopes = new[] { "Files.ReadWrite.AppFolder" };
-
-        private static string AppId = "com.blenderfreaky.pictua";
-
-        private static string RedirectUri
+        public async Task InitializeGraphClientAsync()
         {
-            get
+            var currentAccounts = await App.PCA.GetAccountsAsync().ConfigureAwait(false);
+            try
             {
-                return "msalfd564916-e1a7-41aa-9e2e-5867cac60129://auth";
+                if (!currentAccounts.Any()) throw new Exception("No accounts found");
 
-                if (DeviceInfo.Platform == DevicePlatform.Android)
-                {
-                    return $"msauth://{AppId}/{{ultNtp+zVc6mYSrp6uyg5zdU33A=}}";
-                }
-                else if (DeviceInfo.Platform == DevicePlatform.iOS)
-                {
-                    return $"msauth.{AppId}://auth";
-                }
-                else if (DeviceInfo.Platform == DevicePlatform.UWP)
-                {
-                    return "https://login.microsoftonline.com/common/oauth2/nativeclient";
-                }
+                // Initialize Graph client
+                _graphClient = new GraphServiceClient(new DelegateAuthenticationProvider(
+                    async (requestMessage) =>
+                    {
+                        var result = await App.PCA.AcquireTokenSilent(Scopes, currentAccounts.FirstOrDefault())
+                            .ExecuteAsync().ConfigureAwait(false);
 
-                return string.Empty;
+                        requestMessage.Headers.Authorization =
+                            new AuthenticationHeaderValue("Bearer", result.AccessToken);
+                    }));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Failed to initialized graph client.");
+                Debug.WriteLine($"Accounts in the msal cache: {currentAccounts.Count()}.");
+                Debug.WriteLine($"See exception message for details: {ex.Message}");
             }
         }
 
-        public async Task<bool> SignInAsync()
+        public async Task<bool> SignInAsync(bool onlySilent = false)
         {
             try
             {
-                var accounts = await _app.GetAccountsAsync().ConfigureAwait(false);
+                var accounts = await App.PCA.GetAccountsAsync().ConfigureAwait(false);
                 var firstAccount = accounts.FirstOrDefault();
-                var authResult = await _app.AcquireTokenSilent(Scopes, firstAccount).ExecuteAsync().ConfigureAwait(false);
+                var authResult = await App.PCA.AcquireTokenSilent(Scopes, firstAccount).ExecuteAsync().ConfigureAwait(false);
 
                 // Store the access token securely for later use.
                 await SecureStorage.SetAsync("AccessToken", authResult?.AccessToken).ConfigureAwait(false);
@@ -65,11 +66,14 @@ namespace Pictua.OneDrive
             }
             catch (MsalUiRequiredException)
             {
+                if (onlySilent) return false;
                 try
                 {
                     // This means we need to login again through the MSAL window.
-                    var authResult = await _app.AcquireTokenInteractive(Scopes)
-                                                .ExecuteAsync().ConfigureAwait(false);
+                    var authResult = await App.PCA.AcquireTokenInteractive(Scopes)
+                                                      //.WithUseEmbeddedWebView(true)
+                                                      .WithParentActivityOrWindow(App.ParentWindow)
+                                                      .ExecuteAsync().ConfigureAwait(false);
 
                     // Store the access token securely for later use.
                     await SecureStorage.SetAsync("AccessToken", authResult?.AccessToken).ConfigureAwait(false);
@@ -82,24 +86,24 @@ namespace Pictua.OneDrive
                     return false;
                 }
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.ToString());
-                return false;
-            }
+            //catch (Exception ex)
+            //{
+            //    Debug.WriteLine(ex.ToString());
+            //    return false;
+            //}
         }
 
         public async Task<bool> SignOutAsync()
         {
             try
             {
-                var accounts = await _app.GetAccountsAsync().ConfigureAwait(false);
+                var accounts = await App.PCA.GetAccountsAsync().ConfigureAwait(false);
 
                 // Go through all accounts and remove them.
                 while (accounts.Any())
                 {
-                    await _app.RemoveAsync(accounts.FirstOrDefault()).ConfigureAwait(false);
-                    accounts = await _app.GetAccountsAsync().ConfigureAwait(false);
+                    await App.PCA.RemoveAsync(accounts.FirstOrDefault()).ConfigureAwait(false);
+                    accounts = await App.PCA.GetAccountsAsync().ConfigureAwait(false);
                 }
 
                 // Clear our access token from secure storage.
@@ -114,19 +118,11 @@ namespace Pictua.OneDrive
             }
         }
 
-        public static async Task<OneDrive> CreateAsync(string clientId)
+        public static async Task<OneDrive> CreateAsync(App app)
         {
-            var app = PublicClientApplicationBuilder
-                               .Create(clientId)
-                               .WithRedirectUri(RedirectUri)
-                               .Build();
+            var onedrive = new OneDrive(app);
 
-            var authProvider = new DeviceCodeProvider(app, Scopes);
-            var graphClient = new GraphServiceClient(authProvider);
-
-            var onedrive = new OneDrive(app, graphClient);
-
-            await onedrive.SignInAsync().ConfigureAwait(false);
+            await onedrive.InitializeGraphClientAsync().ConfigureAwait(false);
 
             return onedrive;
         }
@@ -150,7 +146,7 @@ namespace Pictua.OneDrive
             return AppRoot.ItemWithPath(originPath).Content.Request().GetAsync();
         }
 
-        public Task<DriveItem?> UploadAsync(Stream stream, string targetPath)
+        public Task<DriveItem> UploadAsync(Stream stream, string targetPath)
         {
             // TODO: Choose between small and large file
             return UploadLargeFileAsync(stream, targetPath);
@@ -162,13 +158,13 @@ namespace Pictua.OneDrive
                 .PutAsync<DriveItem>(stream);
         }
 
-        public async Task<DriveItem?> UploadLargeFileAsync(Stream stream, string targetPath, int maxSliceSize = -1, IProgress<long>? progress = null)
+        public async Task<DriveItem> UploadLargeFileAsync(Stream stream, string targetPath, int maxSliceSize = -1, IProgress<long> progress = null)
         {
             // TODO: Support fileUploadTask.ResumeAsnyc
             var uploadSession = await AppRoot.ItemWithPath(targetPath)
                             .CreateUploadSession().Request().PostAsync().ConfigureAwait(false);
 
-            var fileUploadTask = new LargeFileUploadTask<DriveItem>(uploadSession, stream, maxSliceSize);
+            var fileUploadTask = new LargeFileUploadTask<DriveItem>(uploadSession, stream, maxSliceSize < 0 ? 1024 * 320 : maxSliceSize);
 
             try
             {
