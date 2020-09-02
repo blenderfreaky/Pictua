@@ -49,6 +49,7 @@ namespace Pictua.XFUI
         private async void SignInButton_Clicked(object sender, EventArgs e)
         {
             SignedIn = await Server.OneDrive.SignInAsync().ConfigureAwait(false);
+            if (SignedIn && !Server.OneDrive.IsGraphClientInitialized) await Server.OneDrive.InitializeGraphClientAsync().ConfigureAwait(false);
         }
 
         private async void SyncButton_Clicked(object sender, EventArgs e)

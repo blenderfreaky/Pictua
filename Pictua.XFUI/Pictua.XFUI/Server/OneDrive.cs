@@ -16,6 +16,8 @@ namespace Pictua.OneDrive
         private readonly App App;
         private GraphServiceClient _graphClient;
 
+        public bool IsGraphClientInitialized => _graphClient != null;
+
         private IDriveItemRequestBuilder AppRoot => _graphClient.Drive.Special.AppRoot;
 
         public static string[] Scopes = { "Files.ReadWrite.AppFolder" };

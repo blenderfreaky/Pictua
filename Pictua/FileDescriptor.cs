@@ -12,7 +12,7 @@ namespace Pictua
 
         public string ContentHashString => BitConverter.ToString(ContentHash).Replace("-", "").ToLowerInvariant();
 
-        public string UniqueName => $"{ContentHashString}.{Extension}";
+        public string UniqueName => $"{ContentHashString}{Extension}";
 
         public FileDescriptor(string extension, byte[] contentHash)
         {

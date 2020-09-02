@@ -9,9 +9,9 @@ namespace Pictua.XFUI.UWP
         {
             InitializeComponent();
 
-            var redirectURI = WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
+            //var redirectURI = WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
 
-            LoadApplication(new XFUI.App(redirectURI.AbsoluteUri));
+            LoadApplication(new XFUI.App("https://sso/"));
         }
     }
 }

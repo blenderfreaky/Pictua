@@ -8,7 +8,7 @@
 
   <Identity
     Name="e387b4c9-46ca-4c6d-90ed-f1fea7a97f32"
-    Publisher="CN=c3f2d638-d21a-4fb1-beaf-869329915000"
+    Publisher="CN=blenderfreaky"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="ec0cc741-fd3e-485c-81be-68815c480690" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
@@ -54,5 +54,6 @@
     <uap:Capability Name="picturesLibrary"/>
     <uap:Capability Name="musicLibrary"/>
     <uap:Capability Name="videosLibrary"/>
+    <uap:Capability Name="removableStorage"/>
   </Capabilities>
 </Package>

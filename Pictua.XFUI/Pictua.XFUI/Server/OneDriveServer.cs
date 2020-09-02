@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Pictua.XFUI;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -13,6 +14,11 @@ namespace Pictua.OneDrive
         {
             OneDrive = oneDrive;
         }
+
+#nullable disable
+        [Obsolete("Only for serialization")]
+        private OneDriveServer() : base(null, null) { }
+#nullable restore
 
         public static async Task<OneDriveServer> Create(App app, FilePathConfig filePaths, ILogger<OneDriveServer> logger)
         {

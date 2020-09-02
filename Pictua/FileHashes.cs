@@ -7,8 +7,14 @@ namespace Pictua
     {
         public static byte[] CalculateMD5(string path)
         {
-            using var md5 = MD5.Create();
             using var stream = File.OpenRead(path);
+
+            return CalculateMD5(stream);
+        }
+
+        public static byte[] CalculateMD5(Stream stream)
+        {
+            using var md5 = MD5.Create();
 
             return md5.ComputeHash(stream);
         }

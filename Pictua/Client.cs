@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Pictua.HistoryTracking;
+using Pictua.StateTracking;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,9 +16,7 @@ namespace Pictua
 
         public ClientIdentity Identity { get; }
 
-        public History History { get; protected internal set; }
-
-        public IDictionary<FileDescriptor, FileMetadata?> Files { get; }
+        public State State { get; set; }
 
         public ISet<FileDescriptor> FilesAwaitingDownload { get; }
         public ISet<FileDescriptor> FilesAwaitingUpload { get; }
@@ -34,14 +32,16 @@ namespace Pictua
         [XmlIgnore]
         private bool disposedValue;
 
+#nullable disable
+        [Obsolete("Only for serialization")]
         private Client() { }
+#nullable restore
 
         protected Client(FilePathConfig filePaths, ClientIdentity identity, ILogger<Client> logger)
         {
             FilePaths = filePaths;
             Identity = identity;
-            History = new History();
-            Files = new Dictionary<FileDescriptor, FileMetadata?>();
+            State = new State();
             FilesAwaitingDownload = new HashSet<FileDescriptor>();
             FilesAwaitingUpload = new HashSet<FileDescriptor>();
             DeletedOn = new Dictionary<FileDescriptor, DateTime>();
@@ -131,15 +131,15 @@ namespace Pictua
             if (!Lock()) throw new Exception("Client locking failed.");
             if (!await server.LockAsync().ConfigureAwait(false)) throw new Exception("Server locking failed.");
 
-            var merged = server.History.MergeFrom(History);
+            var merged = State.Merge(server.State);
 
-            var localChanges = History.HeadState.ChangeTo(merged.HeadState, Identity, DateTime.UtcNow).Select(x => ApplyChangeLocally(x, server));
-            var serverChanges = server.History.HeadState.ChangeTo(merged.HeadState, Identity, DateTime.UtcNow).Select(x => ApplyChangeOnServer(x, server));
+            var localChanges = State.ChangeTo(merged, Identity, DateTime.UtcNow).Select(x => ApplyChangeLocally(x, server));
+            var serverChanges = server.State.ChangeTo(merged, Identity, DateTime.UtcNow).Select(x => ApplyChangeOnServer(x, server));
 
             await Task.WhenAll(localChanges.Concat(serverChanges)).ConfigureAwait(false);
 
-            History = merged;
-            server.History = merged.Clone();
+            State = merged;
+            server.State = merged.Clone();
 
             Commit();
             await server.CommitAsync().ConfigureAwait(false);
@@ -177,7 +177,7 @@ namespace Pictua
                     break;
 
                 case ChangeMetadata metadata:
-                    Files[metadata.Target] = metadata.NewMetadata;
+                    State.Metadata[metadata.Target] = metadata.NewMetadata;
                     break;
 
                 default:
@@ -211,6 +211,26 @@ namespace Pictua
                 default:
                     throw new ArgumentException("Unknown change type", nameof(change));
             }
+        }
+
+        public void AddFile(string filePath)
+        {
+            var descriptor = new FileDescriptor(filePath);
+            File.Copy(filePath, FilePaths.GetFilePath(descriptor));
+            State.Metadata[descriptor] = new FileMetadata(DateTime.UtcNow, new List<ITag>());
+        }
+
+        public void AddFile(string fileExtension, Stream stream)
+        {
+            var descriptor = new FileDescriptor(fileExtension, FileHashes.CalculateMD5(stream));
+            stream.Seek(0, SeekOrigin.Begin);
+
+            var path = FilePaths.GetFilePath(descriptor);
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            using var fileStream = File.OpenWrite(path);
+            stream.CopyTo(fileStream);
+
+            State.Metadata[descriptor] = new FileMetadata(DateTime.UtcNow, new List<ITag>());
         }
 
         #region IDisposable

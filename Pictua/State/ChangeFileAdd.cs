@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Pictua.HistoryTracking
+namespace Pictua.StateTracking
 {
     public struct ChangeFileAdd : IChange
     {
@@ -27,12 +27,12 @@ namespace Pictua.HistoryTracking
 
         public bool Apply(State state)
         {
-            return state._files.TryAdd(File, NewMetadata);
+            return state.Metadata.TryAdd(File, NewMetadata);
         }
 
         public bool Undo(State state)
         {
-            return state._files.Remove(File);
+            return state.Metadata.Remove(File);
         }
 
         public static bool operator ==(ChangeFileAdd left, ChangeFileAdd right) => left.Equals(right);

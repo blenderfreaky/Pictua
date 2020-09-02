@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Pictua.HistoryTracking
+namespace Pictua.StateTracking
 {
     public struct ChangeMetadata : IChange, IEquatable<ChangeMetadata>
     {
@@ -30,14 +30,14 @@ namespace Pictua.HistoryTracking
         public bool Apply(State state)
         {
             if (!state.HasFile(Target)) return false;
-            state._files[Target] = NewMetadata;
+            state.Metadata[Target] = NewMetadata;
             return true;
         }
 
         public bool Undo(State state)
         {
             if (!state.HasFile(Target)) return false;
-            state._files[Target] = OldMetadata;
+            state.Metadata[Target] = OldMetadata;
             return true;
         }
 

@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using Pictua.HistoryTracking;
+using Pictua.StateTracking;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -17,7 +16,7 @@ namespace Pictua
 
         public IDictionary<FileDescriptor, ServerFileInfo> Files { get; }
 
-        public History History { get; protected internal set; }
+        public State State { get; set; }
 
         [XmlIgnore]
         protected ILogger<Server> Logger { get; set; }
@@ -36,7 +35,7 @@ namespace Pictua
             FilePaths = filePaths;
             Clients = new HashSet<ClientIdentity>();
             Files = new Dictionary<FileDescriptor, ServerFileInfo>();
-            History = new History();
+            State = new State();
             Logger = logger;
         }
 
@@ -83,21 +82,24 @@ namespace Pictua
 
         public virtual async Task<bool> LockAsync()
         {
+            return true;
             // TODO: Fix race condition
-            if (await FileExistsAsnyc(FilePaths.LockFilePath).ConfigureAwait(false)) return false;
-            return await UploadAsync(new MemoryStream(Encoding.UTF8.GetBytes("Lock")), FilePaths.LockFilePath).ConfigureAwait(false);
+            //if (await FileExistsAsnyc(FilePaths.LockFilePath).ConfigureAwait(false)) return false;
+            //return await UploadAsync(new MemoryStream(Encoding.UTF8.GetBytes("Lock")), FilePaths.LockFilePath).ConfigureAwait(false);
         }
 
         public virtual Task<bool> UnlockAsync()
         {
-            return DeleteAsync(FilePaths.LockFilePath);
+            return Task.FromResult(true);
+            //return DeleteAsync(FilePaths.LockFilePath);
         }
 
         public virtual Task<bool> CommitAsync()
         {
             using var memStream = new MemoryStream();
             Xml.Serialize(GetType(), memStream, this);
-            return UploadAsync(memStream, FilePaths.StateFilePath);
+
+            return UploadAsync(new MemoryStream(memStream.ToArray()), FilePaths.StateFilePath);
         }
     }
 }

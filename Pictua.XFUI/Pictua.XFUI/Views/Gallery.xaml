@@ -5,7 +5,7 @@
              x:Class="Pictua.XFUI.Views.Gallery">
 
     <StackLayout>
-        <Label Text="Start developing now" Style="{StaticResource Title}"/>
+        <Button x:Name="UploadButton" Text="+" Clicked="UploadButton_Clicked"/>
     </StackLayout>
 
 </ContentView>
