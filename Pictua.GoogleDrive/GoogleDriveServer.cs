@@ -30,8 +30,9 @@ namespace Pictua.GoogleDrive
                 // The file token.json stores the user's access and refresh tokens, and is created
                 // automatically when the authorization flow completes for the first time.
                 const string credPath = "token.json";
+                var googleClientSecrets = GoogleClientSecrets.Load(stream);
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
+                    googleClientSecrets.Secrets,
                     Scopes,
                     "user",
                     CancellationToken.None,

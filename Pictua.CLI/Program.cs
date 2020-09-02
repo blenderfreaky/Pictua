@@ -2,6 +2,7 @@
 using Pictua.OneDrive;
 using System.Threading.Tasks;
 using Pictua.GoogleDrive;
+using System;
 
 namespace Pictua.CLI
 {
@@ -13,10 +14,10 @@ namespace Pictua.CLI
                 options.AddConsole());
 
             var client = Client.Create(new FilePathConfig("Pictua"), logger.CreateLogger<Client>());
-            var gdServer = GoogleDriveServer.Create(FilePathConfig.Server, logger.CreateLogger<GoogleDriveServer>());
-            var odServer = OneDriveServer.Create(FilePathConfig.Server, logger.CreateLogger<OneDriveServer>());
+            //var server = GoogleDriveServer.Create(FilePathConfig.Server, logger.CreateLogger<GoogleDriveServer>());
+            var server = await OneDriveServer.Create(FilePathConfig.Server, logger.CreateLogger<OneDriveServer>()).ConfigureAwait(false);
 
-            await client.SyncAsync(gdServer).ConfigureAwait(false);
+            await client.SyncAsync(server).ConfigureAwait(false);
         }
     }
 }

@@ -13,12 +13,12 @@ namespace Pictua.OneDrive
             OneDrive = oneDrive;
         }
 
-        public static OneDriveServer Create(string clientId, FilePathConfig filePaths, ILogger<OneDriveServer> logger)
+        public static async Task<OneDriveServer> Create(string clientId, FilePathConfig filePaths, ILogger<OneDriveServer> logger)
         {
-            return new OneDriveServer(new OneDrive(clientId), filePaths, logger);
+            return new OneDriveServer(await OneDrive.CreateAsync(clientId).ConfigureAwait(false), filePaths, logger);
         }
 
-        public static OneDriveServer Create(FilePathConfig filePaths, ILogger<OneDriveServer> logger)
+        public static Task<OneDriveServer> Create(FilePathConfig filePaths, ILogger<OneDriveServer> logger)
         {
             return Create("fd564916-e1a7-41aa-9e2e-5867cac60129", filePaths, logger);
         }
