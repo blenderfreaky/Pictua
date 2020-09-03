@@ -1,12 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using Pictua.OneDrive;
-using Pictua.XFUI.ViewModels;
+﻿using Pictua.XFUI.ViewModels;
 using ReactiveUI;
 using ReactiveUI.XamForms;
 using System;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
-using Xamarin.Forms;
 
 namespace Pictua.XFUI
 {
@@ -27,8 +23,14 @@ namespace Pictua.XFUI
 
             ViewModel = new MainViewModel();
 
-            this.OneWayBind(App.Current.ViewModel, vm => vm.IsSignedIn, v => v.SignInButton);
-            this.OneWayBind(App.Current.ViewModel, vm => vm.IsSignedIn, v => v.SyncButton);
+            App.Current.ViewModel
+                .WhenAnyValue(vm => vm.IsSignedIn)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(isSignedIn =>
+                {
+                    SignInButton.IsVisible = !isSignedIn;
+                    SyncButton.IsVisible = isSignedIn;
+                });
         }
 
         private void OnBack(object sender, EventArgs e)
