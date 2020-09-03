@@ -53,7 +53,7 @@ namespace Pictua.OneDrive
             }
         }
 
-        public async Task<bool> SignInAsync(bool onlySilent = false)
+        public async Task<bool> SignInAsync(bool forceSilent = false)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace Pictua.OneDrive
             }
             catch (MsalUiRequiredException)
             {
-                if (onlySilent) return false;
+                if (forceSilent) return false;
                 try
                 {
                     // This means we need to login again through the MSAL window.

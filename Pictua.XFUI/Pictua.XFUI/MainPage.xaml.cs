@@ -36,7 +36,7 @@ namespace Pictua.XFUI
 
             Task.Run(async () => {
                 Server = await OneDriveServer.Create((App)Application.Current, FilePathConfig.Server, logger.CreateLogger<OneDriveServer>()).ConfigureAwait(false);
-                SignedIn = await Server.OneDrive.SignInAsync(true).ConfigureAwait(false);
+                SignedIn = await Server.OneDrive.SignInAsync(forceSilent: true).ConfigureAwait(false);
             });
 
             InitializeComponent();

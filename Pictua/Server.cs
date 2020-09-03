@@ -63,16 +63,18 @@ namespace Pictua
         protected abstract Task<bool> DownloadAsync(Stream stream, string originPath);
         protected abstract Task<bool> DeleteAsync(string path);
 
-        public virtual Task<bool> UploadAsync(FileDescriptor fileDescriptor, string originPath)
+        public virtual async Task<bool> UploadAsync(FileDescriptor fileDescriptor, string originPath)
         {
             using var fileStream = File.OpenRead(originPath);
-            return UploadAsync(fileStream, FilePaths.GetFilePath(fileDescriptor));
+            // Use await instead of returning the task to make sure the filestream gets disposed only after the method finishes.
+            return await UploadAsync(fileStream, FilePaths.GetFilePath(fileDescriptor)).ConfigureAwait(false);
         }
 
-        public virtual Task<bool> DownloadAsync(FileDescriptor fileDescriptor, string targetPath)
+        public virtual async Task<bool> DownloadAsync(FileDescriptor fileDescriptor, string targetPath)
         {
             using var fileStream = File.OpenWrite(targetPath);
-            return DownloadAsync(fileStream, FilePaths.GetFilePath(fileDescriptor));
+            // Use await instead of returning the task to make sure the filestream gets disposed only after the method finishes.
+            return await DownloadAsync(fileStream, FilePaths.GetFilePath(fileDescriptor)).ConfigureAwait(false);
         }
 
         public virtual Task<bool> DeleteFileAsync(FileDescriptor file)
@@ -80,9 +82,9 @@ namespace Pictua
             return DeleteAsync(FilePaths.GetFilePath(file));
         }
 
-        public virtual async Task<bool> LockAsync()
+        public virtual Task<bool> LockAsync()
         {
-            return true;
+            return Task.FromResult(true);
             // TODO: Fix race condition
             //if (await FileExistsAsnyc(FilePaths.LockFilePath).ConfigureAwait(false)) return false;
             //return await UploadAsync(new MemoryStream(Encoding.UTF8.GetBytes("Lock")), FilePaths.LockFilePath).ConfigureAwait(false);

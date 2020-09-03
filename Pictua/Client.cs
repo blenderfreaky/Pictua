@@ -213,24 +213,25 @@ namespace Pictua
             }
         }
 
-        public void AddFile(string filePath)
-        {
-            var descriptor = new FileDescriptor(filePath);
-            File.Copy(filePath, FilePaths.GetFilePath(descriptor));
-            State.Metadata[descriptor] = new FileMetadata(DateTime.UtcNow, new List<ITag>());
-        }
-
-        public void AddFile(string fileExtension, Stream stream)
+        public bool AddFile(string fileExtension, Stream stream, bool overwrite = false)
         {
             var descriptor = new FileDescriptor(fileExtension, FileHashes.CalculateMD5(stream));
+            var doesFileExistsAlready = State.Metadata.ContainsKey(descriptor);
+
+            if (doesFileExistsAlready && !overwrite) return false;
+
             stream.Seek(0, SeekOrigin.Begin);
 
             var path = FilePaths.GetFilePath(descriptor);
+
             Directory.CreateDirectory(Path.GetDirectoryName(path));
+
             using var fileStream = File.OpenWrite(path);
             stream.CopyTo(fileStream);
 
-            State.Metadata[descriptor] = new FileMetadata(DateTime.UtcNow, new List<ITag>());
+            if (!doesFileExistsAlready) State.Metadata[descriptor] = new FileMetadata(DateTime.UtcNow, new List<ITag>());
+
+            return true;
         }
 
         #region IDisposable
