@@ -22,8 +22,6 @@
     <PackageReference Include="Xamarin.Forms" Version="4.8.0.1364" />
     <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
     <PackageReference Include="Xamarin.Plugin.FilePicker" Version="2.1.41" />
-    <PackageReference Include="Pharmacist.MsBuild" Version="1.8.1" PrivateAssets="all" />
-    <PackageReference Include="Pharmacist.Common" Version="1.8.1" />
   </ItemGroup>
 
   <ItemGroup>

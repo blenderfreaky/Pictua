@@ -1,6 +1,7 @@
 ﻿using Pictua.XFUI.ViewModels;
 using Plugin.FilePicker;
 using ReactiveUI.XamForms;
+using System.IO;
 using Xamarin.Forms.Xaml;
 
 namespace Pictua.XFUI.Views
