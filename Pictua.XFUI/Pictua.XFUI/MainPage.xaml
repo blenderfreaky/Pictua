@@ -1,9 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+<rxui:ReactiveContentPage
+             xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:Pictua.XFUI.Views"
+             xmlns:vm="clr-namespace:Pictua.XFUI.ViewModels"
              xmlns:fontawesome="clr-namespace:FontAwesome"
-             x:Class="Pictua.XFUI.MainPage">
+             xmlns:rxui="clr-namespace:ReactiveUI.XamForms;assembly=ReactiveUI.XamForms"
+             x:Class="Pictua.XFUI.MainPage"
+             x:TypeArguments="vm:MainViewModel">
 
     <StackLayout>
         <Frame BackgroundColor="{DynamicResource NavigationBarColor}" CornerRadius="0">
@@ -16,4 +20,4 @@
         <views:Gallery/>
     </StackLayout>
     
-</ContentPage>
+</rxui:ReactiveContentPage>

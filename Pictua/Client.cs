@@ -33,8 +33,10 @@ namespace Pictua
         private bool disposedValue;
 
 #nullable disable
+
         [Obsolete("Only for serialization")]
         private Client() { }
+
 #nullable restore
 
         protected Client(FilePathConfig filePaths, ClientIdentity identity, ILogger<Client> logger)
@@ -249,6 +251,7 @@ namespace Pictua
                 disposedValue = true;
             }
         }
+
         ~Client()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -262,6 +265,6 @@ namespace Pictua
             GC.SuppressFinalize(this);
         }
 
-        #endregion
+        #endregion IDisposable
     }
 }

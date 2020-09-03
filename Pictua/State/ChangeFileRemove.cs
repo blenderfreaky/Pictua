@@ -21,6 +21,7 @@ namespace Pictua.StateTracking
         }
 
         public override bool Equals(object? obj) => obj is ChangeFileRemove remove && Equals(remove);
+
         public bool Equals(ChangeFileRemove other) => EqualityComparer<ClientIdentity>.Default.Equals(Author, other.Author) && Time == other.Time && EqualityComparer<FileDescriptor>.Default.Equals(File, other.File) && EqualityComparer<FileMetadata?>.Default.Equals(OldMetadata, other.OldMetadata);
 
         public override int GetHashCode() => HashCode.Combine(Author, Time, File, OldMetadata);

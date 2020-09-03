@@ -59,8 +59,11 @@ namespace Pictua
         }
 
         protected abstract Task<bool> FileExistsAsnyc(string path);
+
         protected abstract Task<bool> UploadAsync(Stream stream, string targetPath);
+
         protected abstract Task<bool> DownloadAsync(Stream stream, string originPath);
+
         protected abstract Task<bool> DeleteAsync(string path);
 
         public virtual async Task<bool> UploadAsync(FileDescriptor fileDescriptor, string originPath)

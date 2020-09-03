@@ -17,6 +17,8 @@ namespace Pictua
             IsContentOnline = isContentOnline;
         }
 
-        public ServerFileInfo() : this(null, new HashSet<ClientIdentity>(), false) { }
+        public ServerFileInfo() : this(null, new HashSet<ClientIdentity>(), false)
+        {
+        }
     }
 }

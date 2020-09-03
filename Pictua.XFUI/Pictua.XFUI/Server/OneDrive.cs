@@ -1,6 +1,5 @@
 ﻿using Microsoft.Graph;
 using Microsoft.Identity.Client;
-using Pictua.XFUI;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -13,7 +12,7 @@ namespace Pictua.OneDrive
 {
     public class OneDrive
     {
-        private readonly App App;
+        private readonly IPublicClientApplication _pca;
         private GraphServiceClient _graphClient;
 
         public bool IsGraphClientInitialized => _graphClient != null;
@@ -22,14 +21,14 @@ namespace Pictua.OneDrive
 
         public static string[] Scopes = { "Files.ReadWrite.AppFolder" };
 
-        public OneDrive(App app)
+        public OneDrive(IPublicClientApplication pca)
         {
-            App = app;
+            _pca = pca;
         }
 
         public async Task InitializeGraphClientAsync()
         {
-            var currentAccounts = await App.PCA.GetAccountsAsync().ConfigureAwait(false);
+            var currentAccounts = await _pca.GetAccountsAsync().ConfigureAwait(false);
             try
             {
                 if (!currentAccounts.Any()) throw new Exception("No accounts found");
@@ -38,7 +37,7 @@ namespace Pictua.OneDrive
                 _graphClient = new GraphServiceClient(new DelegateAuthenticationProvider(
                     async (requestMessage) =>
                     {
-                        var result = await App.PCA.AcquireTokenSilent(Scopes, currentAccounts.FirstOrDefault())
+                        var result = await _pca.AcquireTokenSilent(Scopes, currentAccounts.FirstOrDefault())
                             .ExecuteAsync().ConfigureAwait(false);
 
                         requestMessage.Headers.Authorization =
@@ -57,9 +56,9 @@ namespace Pictua.OneDrive
         {
             try
             {
-                var accounts = await App.PCA.GetAccountsAsync().ConfigureAwait(false);
+                var accounts = await _pca.GetAccountsAsync().ConfigureAwait(false);
                 var firstAccount = accounts.FirstOrDefault();
-                var authResult = await App.PCA.AcquireTokenSilent(Scopes, firstAccount).ExecuteAsync().ConfigureAwait(false);
+                var authResult = await _pca.AcquireTokenSilent(Scopes, firstAccount).ExecuteAsync().ConfigureAwait(false);
 
                 // Store the access token securely for later use.
                 await SecureStorage.SetAsync("AccessToken", authResult?.AccessToken).ConfigureAwait(false);
@@ -72,9 +71,7 @@ namespace Pictua.OneDrive
                 try
                 {
                     // This means we need to login again through the MSAL window.
-                    var authResult = await App.PCA.AcquireTokenInteractive(Scopes)
-                                                      //.WithUseEmbeddedWebView(true)
-                                                      .WithParentActivityOrWindow(App.ParentWindow)
+                    var authResult = await _pca.AcquireTokenInteractive(Scopes)
                                                       .ExecuteAsync().ConfigureAwait(false);
 
                     // Store the access token securely for later use.
@@ -99,13 +96,13 @@ namespace Pictua.OneDrive
         {
             try
             {
-                var accounts = await App.PCA.GetAccountsAsync().ConfigureAwait(false);
+                var accounts = await _pca.GetAccountsAsync().ConfigureAwait(false);
 
                 // Go through all accounts and remove them.
                 while (accounts.Any())
                 {
-                    await App.PCA.RemoveAsync(accounts.FirstOrDefault()).ConfigureAwait(false);
-                    accounts = await App.PCA.GetAccountsAsync().ConfigureAwait(false);
+                    await _pca.RemoveAsync(accounts.FirstOrDefault()).ConfigureAwait(false);
+                    accounts = await _pca.GetAccountsAsync().ConfigureAwait(false);
                 }
 
                 // Clear our access token from secure storage.
@@ -120,13 +117,9 @@ namespace Pictua.OneDrive
             }
         }
 
-        public static async Task<OneDrive> CreateAsync(App app)
+        public static OneDrive Create(IPublicClientApplication pca)
         {
-            var onedrive = new OneDrive(app);
-
-            await onedrive.InitializeGraphClientAsync().ConfigureAwait(false);
-
-            return onedrive;
+            return new OneDrive(pca);
         }
 
         public async Task<bool> FileExistsAsync(string path)

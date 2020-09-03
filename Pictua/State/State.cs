@@ -21,7 +21,9 @@ namespace Pictua.StateTracking
             Metadata = files;
         }
 
-        public State() : this(new Dictionary<FileDescriptor, FileMetadata?>()) { }
+        public State() : this(new Dictionary<FileDescriptor, FileMetadata?>())
+        {
+        }
 
         public bool Apply(IChange change)
         {

@@ -1,11 +1,15 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+<rxui:ReactiveContentView
+             xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:Pictua.XFUI.Views"
+             xmlns:vm="clr-namespace:Pictua.XFUI.ViewModels"
              xmlns:fontawesome="clr-namespace:FontAwesome"
-             x:Class="Pictua.XFUI.Views.Gallery">
+             xmlns:rxui="clr-namespace:ReactiveUI.XamForms;assembly=ReactiveUI.XamForms"
+             x:Class="views:Gallery"
+             x:TypeArguments="vm:GalleryViewModel">
 
     <StackLayout>
-        <Button x:Name="UploadButton" Text="+" Clicked="UploadButton_Clicked"/>
+        <Button x:Name="UploadButton" Text="+" Clicked="UploadButton_Clicked" />
     </StackLayout>
-
-</ContentView>
+</rxui:ReactiveContentView>

@@ -14,6 +14,7 @@ namespace Pictua
         }
 
         public override bool Equals(object? obj) => obj is ClientIdentity identity && Equals(identity);
+
         public bool Equals(ClientIdentity other) => Guid == other.Guid;
 
         public override int GetHashCode() => HashCode.Combine(Guid);

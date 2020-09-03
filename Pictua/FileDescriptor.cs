@@ -28,6 +28,7 @@ namespace Pictua
         }
 
         public override bool Equals(object? obj) => obj is FileDescriptor descriptor && Equals(descriptor);
+
         public bool Equals(FileDescriptor other) => Extension == other.Extension && ContentHash.SequenceEqual(other.ContentHash);
 
         public override int GetHashCode() => HashCode.Combine(Extension, ContentHash, ContentHashString, UniqueName);

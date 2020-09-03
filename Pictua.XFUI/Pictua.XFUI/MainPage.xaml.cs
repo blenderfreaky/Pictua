@@ -1,45 +1,34 @@
 ﻿using Microsoft.Extensions.Logging;
 using Pictua.OneDrive;
+using Pictua.XFUI.ViewModels;
+using ReactiveUI;
+using ReactiveUI.XamForms;
 using System;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Pictua.XFUI
 {
-    public partial class MainPage : ContentPage
+    public partial class MainPage : ReactiveContentPage<MainViewModel>
     {
-        public Client Client;
-        public OneDriveServer Server;
-
-        private bool _signedIn;
-        public bool SignedIn
-        {
-            get => _signedIn;
-            set
-            {
-                Dispatcher.BeginInvokeOnMainThread(() =>
-                {
-                    SignInButton.IsVisible = !value;
-                    SyncButton.IsVisible = value;
-                });
-
-                _signedIn = value;
-            }
-        }
-
         public MainPage()
         {
-            var logger = LoggerFactory.Create(options =>
-                options.AddConsole());
-
-            Client = Client.Create(FilePathConfig.Client, logger.CreateLogger<Client>());
-
-            Task.Run(async () => {
-                Server = await OneDriveServer.Create((App)Application.Current, FilePathConfig.Server, logger.CreateLogger<OneDriveServer>()).ConfigureAwait(false);
-                SignedIn = await Server.OneDrive.SignInAsync(forceSilent: true).ConfigureAwait(false);
-            });
+            //    App.Current.ViewModel
+            //        .WhenAnyValue(x => x.IsSignedIn)
+            //        .Throttle(TimeSpan.FromMilliseconds(200))
+            //        .Subscribe(value =>
+            //    {
+            //        SignInButton.IsVisible = !value;
+            //        SyncButton.IsVisible = value;
+            //    });
 
             InitializeComponent();
+
+            ViewModel = new MainViewModel();
+
+            this.OneWayBind(App.Current.ViewModel, vm => vm.IsSignedIn, v => v.SignInButton);
+            this.OneWayBind(App.Current.ViewModel, vm => vm.IsSignedIn, v => v.SyncButton);
         }
 
         private void OnBack(object sender, EventArgs e)
@@ -48,13 +37,15 @@ namespace Pictua.XFUI
 
         private async void SignInButton_Clicked(object sender, EventArgs e)
         {
-            SignedIn = await Server.OneDrive.SignInAsync().ConfigureAwait(false);
-            if (SignedIn && !Server.OneDrive.IsGraphClientInitialized) await Server.OneDrive.InitializeGraphClientAsync().ConfigureAwait(false);
+            var app = App.Current.ViewModel;
+            app.IsSignedIn = await app.Server.OneDrive.SignInAsync().ConfigureAwait(false);
+            if (app.IsSignedIn && !app.Server.OneDrive.IsGraphClientInitialized) await app.Server.OneDrive.InitializeGraphClientAsync().ConfigureAwait(false);
         }
 
         private async void SyncButton_Clicked(object sender, EventArgs e)
         {
-            await Client.SyncAsync(Server).ConfigureAwait(false);
+            var app = App.Current.ViewModel;
+            await app.Client.SyncAsync(app.Server).ConfigureAwait(false);
         }
     }
 }

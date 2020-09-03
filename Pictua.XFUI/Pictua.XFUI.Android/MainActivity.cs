@@ -1,13 +1,13 @@
 ﻿using Android.App;
-using Android.Content.PM;
-using Android.Runtime;
-using Android.OS;
 using Android.Content;
+using Android.Content.PM;
+using Android.OS;
+using Android.Runtime;
 using Microsoft.Identity.Client;
 
 namespace Pictua.XFUI.Droid
 {
-    [Activity(Label = "Pictua.XFUI", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize )]
+    [Activity(Label = "Pictua.XFUI", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
@@ -21,8 +21,9 @@ namespace Pictua.XFUI.Droid
             Xamarin.Forms.Forms.Init(this, savedInstanceState);
 
             LoadApplication(new App());
-            App.ParentWindow = this;
+            App.AuthParentWindow = this;
         }
+
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);

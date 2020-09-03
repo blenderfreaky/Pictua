@@ -30,6 +30,7 @@ namespace Pictua
         }
 
         public string GetFilePath(FileDescriptor fileDescriptor) => Path.Combine(FilesFolderPath, fileDescriptor.UniqueName);
+
         public string GetTrashFilePath(FileDescriptor fileDescriptor) => Path.Combine(TrashFolderPath, fileDescriptor.UniqueName);
     }
 }

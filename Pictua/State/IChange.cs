@@ -10,6 +10,7 @@ namespace Pictua
         DateTime Time { get; }
 
         bool Apply(State state);
+
         bool Undo(State state);
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Pictua.XFUI;
+using Microsoft.Identity.Client;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -16,13 +16,15 @@ namespace Pictua.OneDrive
         }
 
 #nullable disable
+
         [Obsolete("Only for serialization")]
         private OneDriveServer() : base(null, null) { }
+
 #nullable restore
 
-        public static async Task<OneDriveServer> Create(App app, FilePathConfig filePaths, ILogger<OneDriveServer> logger)
+        public static OneDriveServer Create(IPublicClientApplication pca, FilePathConfig filePaths, ILogger<OneDriveServer> logger)
         {
-            return new OneDriveServer(await OneDrive.CreateAsync(app).ConfigureAwait(false), filePaths, logger);
+            return new OneDriveServer(OneDrive.Create(pca), filePaths, logger);
         }
 
         protected override async Task<bool> UploadAsync(Stream stream, string targetPath)

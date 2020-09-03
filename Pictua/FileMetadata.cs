@@ -15,9 +15,11 @@ namespace Pictua
         }
 
         public override bool Equals(object? obj) => obj is FileMetadata metadata && LastUpdated == metadata.LastUpdated && EqualityComparer<IReadOnlyCollection<ITag>>.Default.Equals(Tags, metadata.Tags);
+
         public override int GetHashCode() => HashCode.Combine(LastUpdated, Tags);
 
         public static bool operator ==(FileMetadata left, FileMetadata right) => left.Equals(right);
+
         public static bool operator !=(FileMetadata left, FileMetadata right) => !(left == right);
     }
 }
