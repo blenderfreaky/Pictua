@@ -54,6 +54,7 @@
             <Style TargetType="Button">
                 <Setter Property="BackgroundColor" Value="{DynamicResource TransparentColor}" />
                 <Setter Property="FontSize" Value="Large" />
+                <Setter Property="Padding" Value="2" />
                 <!--<Setter Property="FontFamily" Value="{StaticResource FontAwesomeRegular}" />-->
             </Style>
         </ResourceDictionary>

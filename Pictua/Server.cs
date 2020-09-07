@@ -68,14 +68,14 @@ namespace Pictua
 
         public virtual async Task<bool> UploadAsync(FileDescriptor fileDescriptor, string originPath)
         {
-            using var fileStream = File.OpenRead(originPath);
+            using var fileStream = System.IO.File.OpenRead(originPath);
             // Use await instead of returning the task to make sure the filestream gets disposed only after the method finishes.
             return await UploadAsync(fileStream, FilePaths.GetFilePath(fileDescriptor)).ConfigureAwait(false);
         }
 
         public virtual async Task<bool> DownloadAsync(FileDescriptor fileDescriptor, string targetPath)
         {
-            using var fileStream = File.OpenWrite(targetPath);
+            using var fileStream = System.IO.File.OpenWrite(targetPath);
             // Use await instead of returning the task to make sure the filestream gets disposed only after the method finishes.
             return await DownloadAsync(fileStream, FilePaths.GetFilePath(fileDescriptor)).ConfigureAwait(false);
         }

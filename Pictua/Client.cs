@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Pictua.StateTracking;
+using Pictua.Tags;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,14 +54,14 @@ namespace Pictua
 
         public static Client Create(FilePathConfig clientFiles, ILogger<Client> logger)
         {
-            if (!File.Exists(clientFiles.StateFilePath))
+            if (!System.IO.File.Exists(clientFiles.StateFilePath))
             {
                 return new Client(clientFiles, new ClientIdentity(Environment.MachineName), logger);
             }
 
             try
             {
-                using var fileStream = File.OpenRead(clientFiles.StateFilePath);
+                using var fileStream = System.IO.File.OpenRead(clientFiles.StateFilePath);
                 var client = Xml.Deserialize<Client>(fileStream);
                 client.FilePaths = clientFiles;
                 client.Logger = logger;
@@ -77,7 +79,7 @@ namespace Pictua
 
         public void Commit()
         {
-            using var fileStream = File.OpenWrite(FilePaths.StateFilePath);
+            using var fileStream = System.IO.File.OpenWrite(FilePaths.StateFilePath);
             Xml.Serialize(GetType(), fileStream, this);
         }
 
@@ -85,11 +87,11 @@ namespace Pictua
         {
             try
             {
-                if (File.Exists(FilePaths.LockFilePath))
+                if (System.IO.File.Exists(FilePaths.LockFilePath))
                 {
                     try
                     {
-                        File.Delete(FilePaths.LockFilePath);
+                        System.IO.File.Delete(FilePaths.LockFilePath);
                     }
                     catch (IOException)
                     {
@@ -125,7 +127,7 @@ namespace Pictua
         public void Unlock()
         {
             LockFileStream?.Dispose();
-            File.Delete(FilePaths.LockFilePath);
+            System.IO.File.Delete(FilePaths.LockFilePath);
         }
 
         public async Task SyncAsync(Server server)
@@ -169,7 +171,7 @@ namespace Pictua
                 case ChangeFileRemove fileRemove:
                     try
                     {
-                        File.Move(FilePaths.GetFilePath(fileRemove.File), FilePaths.GetTrashFilePath(fileRemove.File));
+                        System.IO.File.Move(FilePaths.GetFilePath(fileRemove.File), FilePaths.GetTrashFilePath(fileRemove.File));
                         DeletedOn[fileRemove.File] = DateTime.UtcNow;
                     }
                     catch (IOException ex)
@@ -215,12 +217,12 @@ namespace Pictua
             }
         }
 
-        public bool AddFile(string fileExtension, Stream stream, bool overwrite = false)
+        public FileDescriptor? AddFile(string fileExtension, string title, Stream stream, bool overwrite = false)
         {
             var descriptor = new FileDescriptor(fileExtension, FileHashes.CalculateMD5(stream));
             var doesFileExistsAlready = State.Metadata.ContainsKey(descriptor);
 
-            if (doesFileExistsAlready && !overwrite) return false;
+            if (doesFileExistsAlready && !overwrite) return null;
 
             stream.Seek(0, SeekOrigin.Begin);
 
@@ -228,12 +230,21 @@ namespace Pictua
 
             Directory.CreateDirectory(Path.GetDirectoryName(path));
 
-            using var fileStream = File.OpenWrite(path);
+            using var fileStream = System.IO.File.OpenWrite(path);
             stream.CopyTo(fileStream);
 
-            if (!doesFileExistsAlready) State.Metadata[descriptor] = new FileMetadata(DateTime.UtcNow, new List<ITag>());
+            Debug.WriteLine($"Copying {title} to {path}");
 
-            return true;
+            if (!doesFileExistsAlready) State.Metadata[descriptor] = new FileMetadata(DateTime.UtcNow, new List<ITag> { new StringTag("Title", title) });
+
+            return descriptor;
+        }
+
+        public Stream GetFile(FileDescriptor fileDescriptor)
+        {
+            var path = FilePaths.GetFilePath(fileDescriptor);
+
+            return System.IO.File.OpenRead(path);
         }
 
         #region IDisposable

@@ -1,9 +1,6 @@
 ﻿using Pictua.XFUI.ViewModels;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using ReactiveUI.XamForms;
-using System;
-using System.Reactive.Linq;
 
 namespace Pictua.XFUI
 {
@@ -17,8 +14,11 @@ namespace Pictua.XFUI
 
             this.WhenActivated(d =>
             {
-                this.OneWayBind(ViewModel, vm => vm.IsSignedIn, v => v.SignInButton.IsVisible, isSignedIn => !isSignedIn);
-                this.OneWayBind(ViewModel, vm => vm.IsSignedIn, v => v.SyncButton.IsVisible, isSignedIn => isSignedIn);
+                d(this.OneWayBind(ViewModel, vm => vm.IsSignedIn, v => v.SignInButton.IsVisible, isSignedIn => !isSignedIn));
+                d(this.OneWayBind(ViewModel, vm => vm.IsSignedIn, v => v.SyncButton.IsVisible, isSignedIn => isSignedIn));
+
+                d(this.BindCommand(ViewModel, vm => vm.SignIn, v => v.SignInButton));
+                d(this.BindCommand(ViewModel, vm => vm.SyncIn, v => v.SyncButton));
             });
         }
     }

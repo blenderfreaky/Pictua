@@ -10,11 +10,11 @@
              x:TypeArguments="vm:MainPageModel">
 
     <StackLayout>
-        <Frame BackgroundColor="{DynamicResource NavigationBarColor}" CornerRadius="0">
-            <Grid>
-                <Button Text="{x:Static fontawesome:FontAwesomeIcons.ArrowLeft}" FontFamily="{StaticResource FontAwesomeRegular}" HorizontalOptions="Start" TextColor="{DynamicResource SecondaryColor}" Padding="0" Clicked="OnBack" />
-                <Button x:Name="SignInButton" Text="Sign in" HorizontalOptions="End" Clicked="SignInButton_Clicked"/>
-                <Button x:Name="SyncButton" Text="Sync" IsVisible="false" HorizontalOptions="End" Clicked="SyncButton_Clicked"/>
+        <Frame BackgroundColor="{DynamicResource NavigationBarColor}" CornerRadius="0" HeightRequest="100">
+            <Grid HeightRequest="100">
+                <Button Text="{x:Static fontawesome:FontAwesomeIcons.ArrowLeft}" FontFamily="{StaticResource FontAwesomeRegular}" HorizontalOptions="Start" TextColor="{DynamicResource SecondaryColor}" Padding="0" />
+                <Button x:Name="SignInButton" Text="Sign in" HorizontalOptions="End" />
+                <Button x:Name="SyncButton" Text="Sync" IsVisible="false" HorizontalOptions="End" />
             </Grid>
         </Frame>
         <views:GalleryView/>

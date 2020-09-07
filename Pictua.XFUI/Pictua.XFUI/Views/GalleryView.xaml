@@ -13,33 +13,11 @@
     <StackLayout>
         <Button x:Name="UploadButton" Text="+" />
 
-        <flv:FlowListView x:Name="FlowListView" SeparatorVisibility="None" HasUnevenRows="true" FlowColumnMinWidth="110">
-
-            <!--<flv:FlowListView.FlowLoadingTemplate>
-                <DataTemplate>
-                    <ViewCell>
-                        <Label
-                            HorizontalTextAlignment="Center"
-                            VerticalTextAlignment="Center"
-                            TextColor="Black"
-                            Text="Loading..."
-                        ></Label>
-                    </ViewCell>
-                </DataTemplate>
-            </flv:FlowListView.FlowLoadingTemplate>-->
-
-            <!--<flv:FlowListView.FlowEmptyTemplate>
-                <DataTemplate>
-                    <ViewCell>
-                        <Label
-                            HorizontalTextAlignment="Center"
-                            VerticalTextAlignment="Center"
-                            TextColor="Black"
-                            Text="Empty Cell"
-                        ></Label>
-                    </ViewCell>
-                </DataTemplate>
-            </flv:FlowListView.FlowEmptyTemplate>-->
+        <flv:FlowListView x:Name="FlowListView"
+                          SeparatorVisibility="None"
+                          HasUnevenRows="true"
+                          FlowColumnMinWidth="210"
+                          SelectionMode="Single">
 
             <flv:FlowListView.FlowColumnTemplate>
                 <DataTemplate>
@@ -51,13 +29,13 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <ffimageloading:CachedImage HeightRequest="100" Aspect="AspectFill"
-                            DownsampleHeight="100" DownsampleUseDipUnits="false" 
+                        <ffimageloading:CachedImage HeightRequest="200" Aspect="AspectFill"
+                            DownsampleHeight="200" DownsampleUseDipUnits="false" 
                             LoadingPlaceholder="image_loading.png" ErrorPlaceholder="image_error.png"
                             Source="{Binding ImageUrl}"/>
 
                         <Label x:Name="Label" HorizontalOptions="Fill" HorizontalTextAlignment="Center" VerticalOptions="End"
-                            BackgroundColor="Silver" Opacity="0.5" Text="{Binding FileName}"/>
+                            BackgroundColor="Silver" Opacity="0.5" Text="{Binding Title}"/>
                     </Grid>
                 </DataTemplate>
             </flv:FlowListView.FlowColumnTemplate>

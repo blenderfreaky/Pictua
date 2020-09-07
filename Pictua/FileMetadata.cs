@@ -1,12 +1,23 @@
-﻿using System;
+﻿using Pictua.Tags;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Serialization;
 
 namespace Pictua
 {
     public struct FileMetadata
     {
         public DateTime LastUpdated { get; set; }
+
+        [XmlIgnore]
         public IReadOnlyCollection<ITag> Tags { get; set; }
+
+        public List<string> TagStrings
+        {
+            get { return Tags?.Select(x => x.Text).ToList() ?? new List<string>(); }
+            set { Tags = value.Select(x => (ITag)new StringTag(x)).ToList(); }
+        }
 
         public FileMetadata(DateTime lastUpdated, IReadOnlyCollection<ITag> tags)
         {

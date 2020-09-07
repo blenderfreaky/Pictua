@@ -1,4 +1,5 @@
-﻿using Pictua.XFUI.ViewModels;
+﻿using DLToolkit.Forms.Controls;
+using Pictua.XFUI.ViewModels;
 using Xamarin.Forms;
 
 namespace Pictua.XFUI
@@ -16,6 +17,8 @@ namespace Pictua.XFUI
 
         public App(string specialRedirectUri = null)
         {
+            FlowListView.Init();
+
             InitializeComponent();
 
             ViewModel = new AppModel(specialRedirectUri);

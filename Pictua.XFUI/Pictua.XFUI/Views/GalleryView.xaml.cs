@@ -1,8 +1,6 @@
 ﻿using Pictua.XFUI.ViewModels;
-using Plugin.FilePicker;
 using ReactiveUI;
 using ReactiveUI.XamForms;
-using System.IO;
 using Xamarin.Forms.Xaml;
 
 namespace Pictua.XFUI.Views
@@ -18,11 +16,11 @@ namespace Pictua.XFUI.Views
 
             this.WhenActivated(d =>
             {
-                this.OneWayBind(ViewModel, vm => vm.Items, v => v.FlowListView.ItemsSource);
-                this.Bind(ViewModel, vm => vm.LastTappedItem, v => v.FlowListView.FlowLastTappedItem);
+                d(this.OneWayBind(ViewModel, vm => vm.Items, v => v.FlowListView.FlowItemsSource));
+                d(this.Bind(ViewModel, vm => vm.LastTappedItem, v => v.FlowListView.FlowLastTappedItem));
 
-                this.BindCommand(ViewModel, vm => vm.ItemTappedCommand, v => v.FlowListView.FlowItemTappedCommand);
-                this.BindCommand(ViewModel, vm => vm.UploadFileCommand, v => v.UploadButton.Command);
+                d(this.BindCommand(ViewModel, vm => vm.ItemTappedCommand, v => v.FlowListView.FlowItemTappedCommand));
+                d(this.BindCommand(ViewModel, vm => vm.UploadFileCommand, v => v.UploadButton));
             });
         }
     }

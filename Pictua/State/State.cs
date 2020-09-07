@@ -8,9 +8,13 @@ namespace Pictua.StateTracking
     public class State
     {
         [XmlIgnore]
-        public readonly Dictionary<FileDescriptor, FileMetadata?> Metadata;
+        public Dictionary<FileDescriptor, FileMetadata?> Metadata;
 
-        public IEnumerable<(FileDescriptor Descriptor, FileMetadata? Metadata)> Files => Metadata.Select(x => (x.Key, x.Value));
+        public List<File> Files
+        {
+            get { return Metadata.Select(x => new File(x.Key, x.Value)).ToList(); }
+            set { Metadata = value.ToDictionary(x => x.Descriptor, x => x.Metadata); }
+        }
 
         public FileMetadata? GetMetadata(FileDescriptor fileDescriptor) => Metadata.TryGetValue(fileDescriptor, out var metadata) ? metadata : null;
 
@@ -66,5 +70,23 @@ namespace Pictua.StateTracking
         }
 
         public State Clone() => new State(Metadata.ToDictionary());
+    }
+
+    public struct File
+    {
+        public FileDescriptor Descriptor;
+        public FileMetadata? Metadata;
+
+        public File(FileDescriptor descriptor, FileMetadata? metadata)
+        {
+            Descriptor = descriptor;
+            Metadata = metadata;
+        }
+
+        public override bool Equals(object? obj) => obj is File other &&
+                   Descriptor.Equals(other.Descriptor) &&
+                   EqualityComparer<FileMetadata?>.Default.Equals(Metadata, other.Metadata);
+
+        public override int GetHashCode() => HashCode.Combine(Descriptor, Metadata);
     }
 }

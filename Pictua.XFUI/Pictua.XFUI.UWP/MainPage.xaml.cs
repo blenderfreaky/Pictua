@@ -1,5 +1,4 @@
-﻿using System;
-using Windows.Security.Authentication.Web;
+﻿using FFImageLoading.Forms.Platform;
 
 namespace Pictua.XFUI.UWP
 {
@@ -12,6 +11,8 @@ namespace Pictua.XFUI.UWP
             //var redirectURI = WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
 
             LoadApplication(new XFUI.App("https://sso/"));
+            Pictua.XFUI.App.AuthParentWindow = this;
+            CachedImageRenderer.Init();
         }
     }
 }
