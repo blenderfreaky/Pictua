@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Pictua.XFUI.ViewModels
 {
-    public class AppViewModel : ReactiveObject
+    public class AppModel : ReactiveObject
     {
         public Client Client { get; set; }
         public OneDriveServer Server { get; set; }
@@ -15,7 +15,7 @@ namespace Pictua.XFUI.ViewModels
         [Reactive]
         public bool IsSignedIn { get; set; }
 
-        public AppViewModel(string specialRedirectUri = null)
+        public AppModel(string specialRedirectUri = null)
         {
             var pca = PublicClientApplicationBuilder.Create(App.MsalClientID)
                 .WithRedirectUri(specialRedirectUri ?? $"msal{App.MsalClientID}://auth")

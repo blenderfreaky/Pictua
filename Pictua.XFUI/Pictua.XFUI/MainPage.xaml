@@ -7,7 +7,7 @@
              xmlns:fontawesome="clr-namespace:FontAwesome"
              xmlns:rxui="clr-namespace:ReactiveUI.XamForms;assembly=ReactiveUI.XamForms"
              x:Class="Pictua.XFUI.MainPage"
-             x:TypeArguments="vm:MainViewModel">
+             x:TypeArguments="vm:MainPageModel">
 
     <StackLayout>
         <Frame BackgroundColor="{DynamicResource NavigationBarColor}" CornerRadius="0">
@@ -17,7 +17,7 @@
                 <Button x:Name="SyncButton" Text="Sync" IsVisible="false" HorizontalOptions="End" Clicked="SyncButton_Clicked"/>
             </Grid>
         </Frame>
-        <views:Gallery/>
+        <views:GalleryView/>
     </StackLayout>
     
 </rxui:ReactiveContentPage>

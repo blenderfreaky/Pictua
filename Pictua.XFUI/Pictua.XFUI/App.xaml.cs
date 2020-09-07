@@ -12,13 +12,13 @@ namespace Pictua.XFUI
 
         public static object AuthParentWindow { get; set; }
 
-        public AppViewModel ViewModel { get; }
+        public AppModel ViewModel { get; }
 
         public App(string specialRedirectUri = null)
         {
             InitializeComponent();
 
-            ViewModel = new AppViewModel(specialRedirectUri);
+            ViewModel = new AppModel(specialRedirectUri);
 
             MainPage = new MainPage();
         }

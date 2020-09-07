@@ -13,12 +13,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DLToolkit.Forms.Controls.FlowListView" Version="2.0.11" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.7" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.7" />
     <PackageReference Include="Microsoft.Graph" Version="3.12.0" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.18.0" />
     <PackageReference Include="ReactiveUI.Fody" Version="11.5.35" />
     <PackageReference Include="ReactiveUI.XamForms" Version="11.5.35" />
+    <PackageReference Include="Xamarin.FFImageLoading.Forms" Version="2.4.11.982" />
     <PackageReference Include="Xamarin.Forms" Version="4.8.0.1364" />
     <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
     <PackageReference Include="Xamarin.Plugin.FilePicker" Version="2.1.41" />
@@ -35,13 +37,16 @@
     <Compile Update="Themes\DarkTheme.xaml.cs">
       <DependentUpon>DarkTheme.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\GalleryView.xaml.cs">
+      <DependentUpon>GalleryView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Update="Themes\DarkTheme.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Views\Gallery.xaml">
+    <EmbeddedResource Update="Views\GalleryView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

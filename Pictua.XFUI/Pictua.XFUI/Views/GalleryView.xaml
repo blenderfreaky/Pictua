@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<rxui:ReactiveContentView
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:Pictua.XFUI.Views"
+             xmlns:vm="clr-namespace:Pictua.XFUI.ViewModels"
+             xmlns:fontawesome="clr-namespace:FontAwesome"
+             xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+             xmlns:flv="clr-namespace:DLToolkit.Forms.Controls;assembly=DLToolkit.Forms.Controls.FlowListView"
+             xmlns:rxui="clr-namespace:ReactiveUI.XamForms;assembly=ReactiveUI.XamForms"
+             x:Class="Pictua.XFUI.Views.GalleryView"
+             x:TypeArguments="vm:GalleryViewModel">
+    <StackLayout>
+        <Button x:Name="UploadButton" Text="+" />
+
+        <flv:FlowListView x:Name="FlowListView" SeparatorVisibility="None" HasUnevenRows="true" FlowColumnMinWidth="110">
+
+            <!--<flv:FlowListView.FlowLoadingTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Label
+                            HorizontalTextAlignment="Center"
+                            VerticalTextAlignment="Center"
+                            TextColor="Black"
+                            Text="Loading..."
+                        ></Label>
+                    </ViewCell>
+                </DataTemplate>
+            </flv:FlowListView.FlowLoadingTemplate>-->
+
+            <!--<flv:FlowListView.FlowEmptyTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Label
+                            HorizontalTextAlignment="Center"
+                            VerticalTextAlignment="Center"
+                            TextColor="Black"
+                            Text="Empty Cell"
+                        ></Label>
+                    </ViewCell>
+                </DataTemplate>
+            </flv:FlowListView.FlowEmptyTemplate>-->
+
+            <flv:FlowListView.FlowColumnTemplate>
+                <DataTemplate>
+                    <Grid Padding="3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <ffimageloading:CachedImage HeightRequest="100" Aspect="AspectFill"
+                            DownsampleHeight="100" DownsampleUseDipUnits="false" 
+                            LoadingPlaceholder="image_loading.png" ErrorPlaceholder="image_error.png"
+                            Source="{Binding ImageUrl}"/>
+
+                        <Label x:Name="Label" HorizontalOptions="Fill" HorizontalTextAlignment="Center" VerticalOptions="End"
+                            BackgroundColor="Silver" Opacity="0.5" Text="{Binding FileName}"/>
+                    </Grid>
+                </DataTemplate>
+            </flv:FlowListView.FlowColumnTemplate>
+
+        </flv:FlowListView>
+    </StackLayout>
+</rxui:ReactiveContentView>
