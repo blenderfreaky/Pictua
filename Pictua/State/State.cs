@@ -8,7 +8,7 @@ namespace Pictua.StateTracking
     public class State
     {
         [XmlIgnore]
-        public Dictionary<FileDescriptor, FileMetadata?> Metadata;
+        public Dictionary<FileDescriptor, FileMetadata?> Metadata = new Dictionary<FileDescriptor, FileMetadata?>();
 
         public List<File> Files
         {
@@ -25,7 +25,7 @@ namespace Pictua.StateTracking
             Metadata = files;
         }
 
-        public State() : this(new Dictionary<FileDescriptor, FileMetadata?>())
+        public State()
         {
         }
 
@@ -74,8 +74,8 @@ namespace Pictua.StateTracking
 
     public struct File
     {
-        public FileDescriptor Descriptor;
-        public FileMetadata? Metadata;
+        public FileDescriptor Descriptor { get; set; }
+        public FileMetadata? Metadata { get; set; }
 
         public File(FileDescriptor descriptor, FileMetadata? metadata)
         {

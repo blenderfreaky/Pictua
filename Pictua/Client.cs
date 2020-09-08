@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -62,6 +63,13 @@ namespace Pictua
             try
             {
                 using var fileStream = System.IO.File.OpenRead(clientFiles.StateFilePath);
+
+                var a = new MemoryStream();
+                Xml.Serialize(a, new StateTracking.File(new FileDescriptor("ab", new byte[] { 1, 2 }), new FileMetadata(DateTime.UtcNow, new List<ITag>())));
+                var w = a.ToArray();
+                var x = Encoding.UTF8.GetString(w);
+                var res = Xml.Deserialize<StateTracking.File>(new MemoryStream(w));
+
                 var client = Xml.Deserialize<Client>(fileStream);
                 client.FilePaths = clientFiles;
                 client.Logger = logger;
