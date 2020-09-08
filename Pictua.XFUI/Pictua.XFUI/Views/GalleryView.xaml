@@ -11,7 +11,20 @@
              x:Class="Pictua.XFUI.Views.GalleryView"
              x:TypeArguments="vm:GalleryViewModel">
     <StackLayout>
-        <Button x:Name="UploadButton" Text="+" />
+        <Frame BackgroundColor="{DynamicResource NavigationBarColor}"  HeightRequest="100">
+            <Grid HeightRequest="100">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="UploadFileButton"   Grid.Column="0" Text="{x:Static fontawesome:FontAwesomeIcons.FileImport}" FontFamily="{StaticResource FontAwesomeSolid}"   VerticalOptions="FillAndExpand" />
+                <Button x:Name="UploadPhotoButton"  Grid.Column="1" Text="{x:Static fontawesome:FontAwesomeIcons.Image}"      FontFamily="{StaticResource FontAwesomeRegular}" VerticalOptions="FillAndExpand" />
+                <Button x:Name="UploadPhotosButton" Grid.Column="2" Text="{x:Static fontawesome:FontAwesomeIcons.Images}"     FontFamily="{StaticResource FontAwesomeRegular}" VerticalOptions="FillAndExpand" />
+                <Button x:Name="UploadVideoButton"  Grid.Column="3" Text="{x:Static fontawesome:FontAwesomeIcons.Video}"      FontFamily="{StaticResource FontAwesomeSolid}"   VerticalOptions="FillAndExpand" />
+            </Grid>
+        </Frame>
 
         <flv:FlowListView x:Name="FlowListView"
                           SeparatorVisibility="None"
@@ -22,13 +35,6 @@
             <flv:FlowListView.FlowColumnTemplate>
                 <DataTemplate>
                     <Grid Padding="3">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
                         <ffimageloading:CachedImage HeightRequest="200" Aspect="AspectFill"
                             DownsampleHeight="200" DownsampleUseDipUnits="false" 
                             LoadingPlaceholder="image_loading.png" ErrorPlaceholder="image_error.png"

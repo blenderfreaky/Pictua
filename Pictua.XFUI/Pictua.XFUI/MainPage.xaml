@@ -12,9 +12,9 @@
     <StackLayout>
         <Frame BackgroundColor="{DynamicResource NavigationBarColor}" CornerRadius="0" HeightRequest="100">
             <Grid HeightRequest="100">
-                <Button Text="{x:Static fontawesome:FontAwesomeIcons.ArrowLeft}" FontFamily="{StaticResource FontAwesomeRegular}" HorizontalOptions="Start" TextColor="{DynamicResource SecondaryColor}" Padding="0" />
-                <Button x:Name="SignInButton" Text="Sign in" HorizontalOptions="End" />
-                <Button x:Name="SyncButton" Text="Sync" IsVisible="false" HorizontalOptions="End" />
+                <Button x:Name="BackButton" Text="{x:Static fontawesome:FontAwesomeIcons.ArrowLeft}" FontFamily="{StaticResource FontAwesomeSolid}" HorizontalOptions="Start" TextColor="{DynamicResource SecondaryColor}" Padding="0" VerticalOptions="FillAndExpand" />
+                <Button x:Name="SignInButton" Text="Sign in" HorizontalOptions="End" VerticalOptions="FillAndExpand" />
+                <Button x:Name="SyncButton" Text="{x:Static fontawesome:FontAwesomeIcons.Sync}" FontFamily="{StaticResource FontAwesomeSolid}" IsVisible="false" HorizontalOptions="End" VerticalOptions="FillAndExpand" />
             </Grid>
         </Frame>
         <views:GalleryView/>

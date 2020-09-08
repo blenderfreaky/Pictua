@@ -79,8 +79,10 @@ namespace Pictua
 
         public void Commit()
         {
-            using var fileStream = System.IO.File.OpenWrite(FilePaths.StateFilePath);
-            Xml.Serialize(GetType(), fileStream, this);
+            using var memoryStream = new MemoryStream();
+            Xml.Serialize(GetType(), memoryStream, this);
+
+            System.IO.File.WriteAllBytes(FilePaths.StateFilePath, memoryStream.ToArray());
         }
 
         public bool Lock()
@@ -235,7 +237,13 @@ namespace Pictua
 
             Debug.WriteLine($"Copying {title} to {path}");
 
-            if (!doesFileExistsAlready) State.Metadata[descriptor] = new FileMetadata(DateTime.UtcNow, new List<ITag> { new StringTag("Title", title) });
+            if (!doesFileExistsAlready)
+            {
+                lock (State.Metadata)
+                {
+                    State.Metadata[descriptor] = new FileMetadata(DateTime.UtcNow, new List<ITag> { new StringTag("Title", title) });
+                }
+            }
 
             return descriptor;
         }

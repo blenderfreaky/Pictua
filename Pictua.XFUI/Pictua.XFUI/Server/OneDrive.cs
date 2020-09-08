@@ -141,10 +141,12 @@ namespace Pictua.OneDrive
             return AppRoot.ItemWithPath(originPath).Content.Request().GetAsync();
         }
 
-        public Task<DriveItem> UploadAsync(Stream stream, string targetPath)
+        public async Task<DriveItem> UploadAsync(Stream stream, string targetPath)
         {
-            // TODO: Choose between small and large file
-            return UploadLargeFileAsync(stream, targetPath);
+            // TODO: Choose between small and large file more intelligently
+            return await FileExistsAsync(targetPath).ConfigureAwait(false)
+                ? await UploadSmallFileAsync(stream, targetPath).ConfigureAwait(false)
+                : await UploadLargeFileAsync(stream, targetPath).ConfigureAwait(false);
         }
 
         public Task<DriveItem> UploadSmallFileAsync(Stream stream, string targetPath)
