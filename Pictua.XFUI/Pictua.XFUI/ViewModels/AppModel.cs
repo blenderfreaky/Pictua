@@ -1,8 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using DynamicData.Binding;
+using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Pictua.OneDrive;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using System;
+using System.Buffers.Binary;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 namespace Pictua.XFUI.ViewModels
@@ -10,6 +14,9 @@ namespace Pictua.XFUI.ViewModels
     public class AppModel : ReactiveObject
     {
         public Client Client { get; set; }
+        private OneDriveUser OneDriveUser { get; set; }
+
+        [Reactive]
         public OneDriveServer Server { get; set; }
 
         [Reactive]
@@ -27,12 +34,18 @@ namespace Pictua.XFUI.ViewModels
                 options.AddConsole());
 
             Client = Client.Create(FilePathConfig.Client, logger.CreateLogger<Client>());
-            Server = OneDriveServer.Create(pca, FilePathConfig.Server, logger.CreateLogger<OneDriveServer>());
 
-            Task.Run(async () =>
+            this.WhenAnyValue(x => x.IsSignedIn)
+                .Where(x => x)
+                .Subscribe(async _ =>
+                    Server = await OneDriveServer.CreateAsync(OneDriveUser, FilePathConfig.Server, logger.CreateLogger<OneDriveServer>()).ConfigureAwait(false));
+
+            Observable.Start(async () =>
             {
-                await Server.OneDrive.InitializeGraphClientAsync().ConfigureAwait(false);
-                IsSignedIn = await Server.OneDrive.SignInAsync(forceSilent: true).ConfigureAwait(false);
+                OneDriveUser = OneDriveUser.Create(pca);
+
+                await OneDriveUser.InitializeGraphClientAsync().ConfigureAwait(false);
+                IsSignedIn = await OneDriveUser.SignInAsync(forceSilent: true).ConfigureAwait(false);
             });
         }
     }

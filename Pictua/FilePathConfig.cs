@@ -7,7 +7,7 @@ namespace Pictua
     {
         public const string AppName = "Pictua";
         public const string LockFileName = ".lock";
-        public const string StateFileName = "state.xml";
+        public const string StateFileName = "state.json";
         public const string FilesFolderName = "Files";
         public const string TrashFolderName = "Trash";
 

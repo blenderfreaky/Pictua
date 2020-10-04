@@ -10,7 +10,7 @@ using Xamarin.Essentials;
 
 namespace Pictua.OneDrive
 {
-    public class OneDrive
+    public class OneDriveUser
     {
         private readonly IPublicClientApplication _pca;
         private GraphServiceClient _graphClient;
@@ -21,7 +21,7 @@ namespace Pictua.OneDrive
 
         public static string[] Scopes = { "Files.ReadWrite.AppFolder" };
 
-        public OneDrive(IPublicClientApplication pca)
+        public OneDriveUser(IPublicClientApplication pca)
         {
             _pca = pca;
         }
@@ -117,9 +117,9 @@ namespace Pictua.OneDrive
             }
         }
 
-        public static OneDrive Create(IPublicClientApplication pca)
+        public static OneDriveUser Create(IPublicClientApplication pca)
         {
-            return new OneDrive(pca);
+            return new OneDriveUser(pca);
         }
 
         public async Task<bool> FileExistsAsync(string path)

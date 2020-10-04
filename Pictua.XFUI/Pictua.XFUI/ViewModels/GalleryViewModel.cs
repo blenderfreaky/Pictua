@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
@@ -58,7 +59,10 @@ namespace Pictua.XFUI.ViewModels
                 App.Current.ViewModel.Client.Commit();
             });
 
-            ReloadData();
+            App.Current.ViewModel
+                .WhenAnyValue(x => x.Server)
+                .Where(x => x != null)
+                .Subscribe(_ => ReloadData());
         }
 
         private void AddFile(string fileName, Stream stream)
@@ -89,14 +93,14 @@ namespace Pictua.XFUI.ViewModels
             var client = App.Current.ViewModel.Client;
 
             Items = new ObservableCollection<ItemModel>(
-                client.State.Files
+                client.State.Metadata
                 .Select(x => new ItemModel
                 {
-                    Title = x.Metadata?.Tags
+                    Title = x.Value?.Tags
                         .Select(x => (x as StringTag?)?.SubTags)
                         .First(x => x?[0] == "Title")
                         [1],
-                    ImageUrl = client.FilePaths.GetFilePath(x.Descriptor)
+                    ImageUrl = client.FilePaths.GetFilePath(x.Key)
                 }));
         }
 

@@ -10,14 +10,7 @@ namespace Pictua
     {
         public DateTime LastUpdated { get; set; }
 
-        [XmlIgnore]
         public IReadOnlyCollection<ITag> Tags { get; set; }
-
-        public List<string> TagStrings
-        {
-            get { return Tags?.Select(x => x.Text).ToList() ?? new List<string>(); }
-            set { Tags = value.Select(x => (ITag)new StringTag(x)).ToList(); }
-        }
 
         public FileMetadata(DateTime lastUpdated, IReadOnlyCollection<ITag> tags)
         {

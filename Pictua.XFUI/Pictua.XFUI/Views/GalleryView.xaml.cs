@@ -22,7 +22,7 @@ namespace Pictua.XFUI.Views
                 d(this.BindCommand(ViewModel, vm => vm.ItemTappedCommand, v => v.FlowListView.FlowItemTappedCommand));
 
                 d(this.BindCommand(ViewModel, vm => vm.UploadFileCommand, v => v.UploadFileButton));
-                d(this.BindCommand(ViewModel, vm => vm.UploadPhotoCommand, v => v.UploadPhotosButton));
+                d(this.BindCommand(ViewModel, vm => vm.UploadPhotoCommand, v => v.UploadPhotoButton));
                 d(this.BindCommand(ViewModel, vm => vm.UploadPhotosCommand, v => v.UploadPhotosButton));
                 d(this.BindCommand(ViewModel, vm => vm.UploadVideoCommand, v => v.UploadVideoButton));
             });

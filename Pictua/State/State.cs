@@ -1,28 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Xml.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Pictua.StateTracking
 {
     public class State
     {
-        [XmlIgnore]
-        public Dictionary<FileDescriptor, FileMetadata?> Metadata = new Dictionary<FileDescriptor, FileMetadata?>();
+        [JsonIgnore]
+        public Dictionary<FileDescriptor, FileMetadata?> Metadata { get; set; } = new Dictionary<FileDescriptor, FileMetadata?>();
 
-        public List<File> Files
+        [JsonPropertyName("Files"), Obsolete("Only for serialization")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Redundancy", "RCS1213:Remove unused member declaration.", Justification = "<Pending>")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
+        private Dictionary<string, FileMetadata?> FilesJson
         {
-            get { return Metadata.Select(x => new File(x.Key, x.Value)).ToList(); }
-            set { Metadata = value.ToDictionary(x => x.Descriptor, x => x.Metadata); }
+            get => Metadata.ToDictionary(x => x.Key.UniqueName, x => x.Value);
+            set => Metadata = value.ToDictionary(x => new FileDescriptor(Path.GetExtension(x.Key), x.Key), x => x.Value);
         }
 
         public FileMetadata? GetMetadata(FileDescriptor fileDescriptor) => Metadata.TryGetValue(fileDescriptor, out var metadata) ? metadata : null;
 
         public bool HasFile(FileDescriptor fileDescriptor) => Metadata.ContainsKey(fileDescriptor);
 
-        public State(Dictionary<FileDescriptor, FileMetadata?> files)
+        public State(Dictionary<FileDescriptor, FileMetadata?> metadata)
         {
-            Metadata = files;
+            Metadata = metadata;
         }
 
         public State()
@@ -70,23 +74,5 @@ namespace Pictua.StateTracking
         }
 
         public State Clone() => new State(Metadata.ToDictionary());
-    }
-
-    public struct File
-    {
-        public FileDescriptor Descriptor { get; set; }
-        public FileMetadata? Metadata { get; set; }
-
-        public File(FileDescriptor descriptor, FileMetadata? metadata)
-        {
-            Descriptor = descriptor;
-            Metadata = metadata;
-        }
-
-        public override bool Equals(object? obj) => obj is File other &&
-                   Descriptor.Equals(other.Descriptor) &&
-                   EqualityComparer<FileMetadata?>.Default.Equals(Metadata, other.Metadata);
-
-        public override int GetHashCode() => HashCode.Combine(Descriptor, Metadata);
     }
 }

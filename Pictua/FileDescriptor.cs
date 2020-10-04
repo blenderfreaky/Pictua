@@ -9,11 +9,18 @@ namespace Pictua
 
         public string UniqueName { get; set; }
 
-        public FileDescriptor(string extension, byte[] contentHash)
+        public FileDescriptor(string extension, string uniqueName)
         {
             Extension = extension;
-            UniqueName = BitConverter.ToString(contentHash).Replace("-", "").ToLowerInvariant() + Extension;
+            UniqueName = uniqueName;
         }
+
+        public FileDescriptor(string extension, byte[] contentHash) : this(
+            extension,
+            BitConverter.ToString(contentHash)
+            .Replace("-", "")
+            .ToLowerInvariant()
+            + extension) { }
 
         public FileDescriptor(string filePath) : this(Path.GetExtension(filePath), FileHashes.CalculateMD5(filePath)) { }
 

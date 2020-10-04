@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -14,7 +16,7 @@ namespace Pictua
 {
     public class Client : IDisposable
     {
-        [XmlIgnore]
+        [JsonIgnore]
         public FilePathConfig FilePaths { get; private set; }
 
         public ClientIdentity Identity { get; }
@@ -24,21 +26,30 @@ namespace Pictua
         public ISet<FileDescriptor> FilesAwaitingDownload { get; }
         public ISet<FileDescriptor> FilesAwaitingUpload { get; }
 
-        public IDictionary<FileDescriptor, DateTime> DeletedOn { get; }
+        [JsonIgnore]
+        public IDictionary<FileDescriptor, DateTime> DeletedOn { get; private set; }
 
-        [XmlIgnore]
+        [JsonPropertyName("DeletedOn"), Obsolete("Only for serialization")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Redundancy", "RCS1213:Remove unused member declaration.", Justification = "<Pending>")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
+        private Dictionary<string, string> DeletedOnJson
+        {
+            get => DeletedOn.ToDictionary(x => x.Key.UniqueName, x => x.Value.ToString());
+            set => DeletedOn = value.ToDictionary(x => new FileDescriptor(Path.GetExtension(x.Key), x.Key), x => DateTime.Parse(x.Value));
+        }
+
+        [JsonIgnore]
         protected ILogger<Client> Logger { get; set; }
 
-        [XmlIgnore]
+        [JsonIgnore]
         private FileStream? LockFileStream { get; set; }
 
-        [XmlIgnore]
         private bool disposedValue;
 
 #nullable disable
 
         [Obsolete("Only for serialization")]
-        private Client() { }
+        public Client() { }
 
 #nullable restore
 
@@ -55,42 +66,36 @@ namespace Pictua
 
         public static Client Create(FilePathConfig clientFiles, ILogger<Client> logger)
         {
-            if (!System.IO.File.Exists(clientFiles.StateFilePath))
+            if (!File.Exists(clientFiles.StateFilePath))
             {
-                return new Client(clientFiles, new ClientIdentity(Environment.MachineName), logger);
+                return CreateNew(clientFiles, logger);
             }
 
             try
             {
-                using var fileStream = System.IO.File.OpenRead(clientFiles.StateFilePath);
-
-                var a = new MemoryStream();
-                Xml.Serialize(a, new StateTracking.File(new FileDescriptor("ab", new byte[] { 1, 2 }), new FileMetadata(DateTime.UtcNow, new List<ITag>())));
-                var w = a.ToArray();
-                var x = Encoding.UTF8.GetString(w);
-                var res = Xml.Deserialize<StateTracking.File>(new MemoryStream(w));
-
-                var client = Xml.Deserialize<Client>(fileStream);
+                var client = JsonSerializer.Deserialize<Client>(File.ReadAllText(clientFiles.StateFilePath));
                 client.FilePaths = clientFiles;
                 client.Logger = logger;
                 return client;
             }
             catch (FileNotFoundException)
             {
-                return new Client(clientFiles, new ClientIdentity(Environment.MachineName), logger);
+                return CreateNew(clientFiles, logger);
             }
             catch (DirectoryNotFoundException)
             {
-                return new Client(clientFiles, new ClientIdentity(Environment.MachineName), logger);
+                return CreateNew(clientFiles, logger);
             }
+        }
+
+        private static Client CreateNew(FilePathConfig clientFiles, ILogger<Client> logger)
+        {
+            return new Client(clientFiles, new ClientIdentity(Environment.MachineName), logger);
         }
 
         public void Commit()
         {
-            using var memoryStream = new MemoryStream();
-            Xml.Serialize(GetType(), memoryStream, this);
-
-            System.IO.File.WriteAllBytes(FilePaths.StateFilePath, memoryStream.ToArray());
+            System.IO.File.WriteAllBytes(FilePaths.StateFilePath, JsonSerializer.SerializeToUtf8Bytes(this, GetType()));
         }
 
         public bool Lock()

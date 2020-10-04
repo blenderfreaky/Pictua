@@ -2,6 +2,8 @@
 using Pictua.StateTracking;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -9,8 +11,8 @@ namespace Pictua
 {
     public abstract class Server
     {
-        [XmlIgnore]
-        public FilePathConfig FilePaths { get; }
+        [JsonIgnore]
+        public FilePathConfig FilePaths { get; protected set; }
 
         public ISet<ClientIdentity> Clients { get; }
 
@@ -18,9 +20,10 @@ namespace Pictua
 
         public State State { get; set; }
 
-        [XmlIgnore]
+        [JsonIgnore]
         protected ILogger<Server> Logger { get; set; }
 
+        [JsonIgnore]
         public ServerFileInfo this[FileDescriptor fileDescriptor]
         {
             get
@@ -99,12 +102,11 @@ namespace Pictua
             //return DeleteAsync(FilePaths.LockFilePath);
         }
 
-        public virtual Task<bool> CommitAsync()
+        public virtual async Task<bool> CommitAsync()
         {
-            using var memStream = new MemoryStream();
-            Xml.Serialize(GetType(), memStream, this);
-
-            return UploadAsync(new MemoryStream(memStream.ToArray()), FilePaths.StateFilePath);
+            var stream = new MemoryStream();
+            await JsonSerializer.SerializeAsync(stream, this, GetType()).ConfigureAwait(false);
+            return await UploadAsync(stream, FilePaths.StateFilePath).ConfigureAwait(false);
         }
     }
 }
