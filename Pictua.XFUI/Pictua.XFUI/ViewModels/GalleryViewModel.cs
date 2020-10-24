@@ -53,6 +53,7 @@ namespace Pictua.XFUI.ViewModels
 
             UploadVideoCommand = ReactiveCommand.CreateFromTask(async () =>
             {
+                //Xamarin.Essentials.filePicker
                 var file = await CrossMedia.Current.PickVideoAsync().ConfigureAwait(false);
                 if (file == null) return;
                 AddFile(file.AlbumPath, file.GetStream());
